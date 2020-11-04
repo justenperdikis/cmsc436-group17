@@ -7,6 +7,6 @@ Project name: Go-No-Go (NIH)
 
 Names:
 
-Justen Perdikis
-Giovanni Salazar
+Justen Perdikis,
+Giovanni Salazar,
 George Matthew
