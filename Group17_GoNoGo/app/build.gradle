@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "com.example.group17_gonogo"
         minSdkVersion 29
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
