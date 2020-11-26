@@ -1,5 +1,6 @@
 package com.example.group17_gonogo
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -20,6 +21,23 @@ class GoNoGoActivity: AppCompatActivity() {
     private lateinit var colorRed: Color
     private lateinit var colorGray: Color
 
+    private val maxWaitTime = 2000          // moved up from startReactionTest
+
+    // May not need this var once thread/other solution implemented
+    private var wasClicked = false          // moved up from startReactionTest
+
+    // new variables
+    private var startTime: Long = 0
+    private var reactTime: Long = 0
+
+    private var goProbability = 0.8f
+    private val noGoProbability = 1 - goProbability
+
+    private var mode: GNGMode = GNGMode.NONE
+    private var testStatus: TestStatus = TestStatus.TBD
+
+    private var resultList = ArrayList<GNGResult>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.go_no_go)
@@ -36,41 +54,93 @@ class GoNoGoActivity: AppCompatActivity() {
         colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
         colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
 
-
-
-
         startButton.setOnClickListener {
             startReactionTest(reactionTestView)
             startButton.isEnabled = false
+
+        }
+
+        reactionTestView.setOnClickListener() {
+            getStatus()
         }
 
     }
 
+    private fun changeColor() {
+        var rand = (0..100).random()                                    // generate random number between 0 and 100
+
+        var ngBound = 100 * noGoProbability
+
+        if (rand <= ngBound) {
+            mode = GNGMode.NO_GO                                        // record the test is currently showing a No-Go
+            reactionTestView.setBackgroundColor(colorRed.toArgb())
+            reactionTestView.setText("No Go")
+        } else {
+            mode = GNGMode.GO                                           // record the test is currently showing a Go
+            reactionTestView.setBackgroundColor(colorGreen.toArgb())
+            reactionTestView.setText("Go")
+        }
+    }
+
+    private fun getStatus() {
+        if (!wasClicked) {
+            reactTime = getElapsedTime(startTime, System.currentTimeMillis())
+
+            if (reactTime < maxWaitTime) {                      // check if the reaction time is less than the time limit
+
+                if (mode == GNGMode.GO) {                       // if the mode is GO
+                    testStatus = TestStatus.SUCCESS                 // record the result as SUCCESS
+                    reactionTestView.setText("SUCCESS")
+                } else if (mode == GNGMode.NO_GO){              // if the mode is NO GO
+                    testStatus = TestStatus.FAILED                  // record the result as failed
+                    reactionTestView.setText("FAILED")
+                } else {
+                    // do nothing
+                }
+
+            } else {                                            // case when reaction time is >= time limit
+
+                if (mode == GNGMode.GO) {                       // if the mode is GO
+                    testStatus = TestStatus.FAILED                  // record the result as failed
+                } else if (mode == GNGMode.NO_GO){              // if the mode is NO GO
+                    testStatus = TestStatus.SUCCESS                 // record the result as SUCCESS
+                } else {
+                    // do nothing
+                }
+            }
+
+            wasClicked = true                                   // changed to true so the user cannot clicked on the same test more than once
+        }
+    }
+
+
     private fun startReactionTest(view: View) {
         val r = Random()
-        val maxWaitTime = 2000
 
         // Test will be between 8 seconds to 17.5 seconds, as outlined in the project proposal
         // Remember that nextInt() is inclusive to the lower bound and exclusive to the upper,
         // So we add 8000 milliseconds to start at 8 seconds and end at 17.5
-        val testDuration = r.nextInt(10500) + 8000
-        Log.i(TAG, "Test will be $testDuration milliseconds long")
+        //val testDuration = r.nextInt(10500) + 8000
+        //Log.i(TAG, "Test will be $testDuration milliseconds long")
 
-        // May not need this var once thread/other solution implemented
-        var wasClicked = false
+        val testDuration = 20000                    // trial for fixed duration for 10 tests, 2 seconds long per test
+
 
         // We set the color to red as the test begins
-        view.setBackgroundColor(colorRed.toArgb())
+        // view.setBackgroundColor(colorRed.toArgb())
+
         // The view will not have an OnClickListener until we begin our subtests
-        view.setOnClickListener(null)
+        // view.setOnClickListener(null)          // commented out for testing if we want user to be able to click the view when the button is red
+
+        // NEW CODE: get random color with probability 8:2
+        //changeColor()
+
 
         // the OnClickListener for the view -- this is enabled during subtests,
         // and currently only uses a boolean to track whether or not the user clicked the view
         val reactionClick = View.OnClickListener {
             wasClicked = true
         }
-
-
 
         // Test is comprised of subtests -- these tests will change the color of the background
         // to the "go" color after a randomly selected interval of 1 to 3 seconds
@@ -80,7 +150,7 @@ class GoNoGoActivity: AppCompatActivity() {
         val subTestStart = System.currentTimeMillis()
         var colorChangeStart = Long.MAX_VALUE
 
-        Log.i(TAG, "First subTestDuration: $timeUntilNextSubtest")
+        //Log.i(TAG, "First subTestDuration: $timeUntilNextSubtest")
         var currInterval = 0
 
         // The subtestTimer is nested within testTimer, and is responsible for gauging user reaction
@@ -92,22 +162,23 @@ class GoNoGoActivity: AppCompatActivity() {
         // If the user is not fast enough, the onFinish() will be called: it is here that
         // the view color is changed to "no" automatically as the subtest concluded without any input
         // TODO -- Issue a toast and determine logic for handling subtests that the user failed to react to
-        val subtestTimer = object: CountDownTimer(maxWaitTime.toLong(), 1000) {
+        val subtestTimer = object: CountDownTimer(maxWaitTime.toLong(), 2000) {     // interval changed from 1000 to 2000
             override fun onTick(millisUntilFinished: Long) {
-                //Log.i(TAG, "Now in subtestTimer")
-                if (wasClicked) {
-                    Log.i(TAG, "User reacted in time!")
-                    view.setBackgroundColor(colorRed.toArgb())
-                    wasClicked = false
-                    view.setOnClickListener(null)
-                    cancel()
-                }
+                // Log.i(TAG, "Now in subtestTimer")
+                //if (wasClicked) {
+                //    Log.i(TAG, "User reacted in time!")
+                //    view.setBackgroundColor(colorRed.toArgb())
+                //    wasClicked = false
+                //    view.setOnClickListener(null)
+                //    cancel()
+                //}
+
             }
 
             override fun onFinish() {
-                Log.i(TAG, "Not fast enough!")
-                view.setBackgroundColor(colorRed.toArgb())
-                view.setOnClickListener(null)
+                // Log.i(TAG, "Not fast enough!")
+                // view.setBackgroundColor(colorRed.toArgb())
+                // view.setOnClickListener(null)
             }
         }
 
@@ -122,34 +193,55 @@ class GoNoGoActivity: AppCompatActivity() {
         // currInterval starts at 0 and is incremented every 1000 milliseconds in onTick.
         // When currInterval is equal to timeUntilNextSubtest, the required amount of time
         // has passed and the next subtest can begin
-        val testTimer = object: CountDownTimer(testDuration.toLong(), 1000) {
+
+        val testTimer = object: CountDownTimer(testDuration.toLong(), 2000) {       // interval changed from 1000 to 2000
             override fun onTick(millisUntilFinished: Long) {
 //                Log.i(TAG, "Seconds remaining: " + millisUntilFinished/1000)
-//                Log.i(TAG, "Timing for current interval: $currInterval")
-                if (timeUntilNextSubtest.toLong() == (currInterval++).toLong()) {
-                    Log.i(TAG, "Changing to \"go\" color")
+                // Log.i(TAG, "Timing for current interval: $currInterval")
+                //if (timeUntilNextSubtest.toLong() == (currInterval++).toLong()) {
+                    // Log.i(TAG, "Changing to \"go\" color")
                     // This is where the subtest actually begins.
                     // Change the view color to "go" color, and wait for user input.
                     // Create a nested timer that will countdown using maxWaitTime.
                     // If the user reacts in time, cancel() the nested timer
                     // TODO -- record reaction speed for each subtest
                     // If the user is too slow, handle changing view color back to "no" color in onFinish
-                    view.setBackgroundColor(colorGreen.toArgb())
-                    view.setOnClickListener(reactionClick)
-                    subtestTimer.start()
+                //    view.setBackgroundColor(colorGreen.toArgb())
+                //    view.setOnClickListener(reactionClick)
+                //    subtestTimer.start()                               // starting subtestTimer here, timer will be called every countDownInterval
 //                    view.setOnClickListener(null)
                     // Regenerate subTestDuration with a function
-                    timeUntilNextSubtest = generateDuration(r, 3, 1)
-                    Log.i(TAG, "New subTestDuration: $timeUntilNextSubtest")
-                    currInterval = 0
+                 //   timeUntilNextSubtest = generateDuration(r, 3, 1)
+                 //   Log.i(TAG, "New subTestDuration: $timeUntilNextSubtest")
+                 //   currInterval = 0
+                //}
+
+                if (mode != GNGMode.NONE) {
+                    if (testStatus != TestStatus.TBD) {
+                        recordScore()                       // record score
+                    } else {
+                        getStatus()
+                        recordScore()                       // record score
+                    }
                 }
+                startTime = System.currentTimeMillis()      // get new startTime
+                changeColor()
+
+                // since subtestTimer will finish every countdownInterval, start new subtestTimer
+                // might not need this
+                // subtestTimer.start()
+
 
             }
+
             override fun onFinish() {
                 Log.i(TAG, "Testing Done!")
                 view.setBackgroundColor(colorGray.toArgb())
                 startButton.isEnabled = true
                 startButton.text = "Retry?"
+                getStatus()                                 // check if the user pass or fail the last test
+                recordScore()                               // record the last test result
+                showResult()                                // display the result
             }
         }
         testTimer.start()
@@ -175,8 +267,24 @@ class GoNoGoActivity: AppCompatActivity() {
 //            timeElapsed = System.currentTimeMillis()
 //            true
 //        }
-
     }
+
+    private fun recordScore() {
+        // Log.i(TAG, "Mode: $mode, Test status: $testStatus")
+        var result = GNGResult(reactTime, mode, testStatus)     // Create a GNGResult object with the values obtained from last test
+        resultList.add(result)                                  // add result to the arraylist
+        testStatus = TestStatus.TBD                             // reset the status for the next test
+        wasClicked = false                                      // reset the value for the next test
+        goProbability -= 0.02f                                  // increase the chance of No-Go appear as the test goes on, might need to adjust the number later
+    }
+
+    private fun showResult() {
+        // create intent to pass the result list to popup activity
+        val intent = Intent(applicationContext, TestResultPopUp::class.java)
+        intent.putExtra("result", resultList)
+        startActivity(intent)
+    }
+
 
     // Simple function to reduce clutter in important computations -- probably do not need this anymore
     private fun getElapsedTime(start: Long, end: Long): Long {
@@ -191,4 +299,12 @@ class GoNoGoActivity: AppCompatActivity() {
     companion object {
         const val TAG = "GoNoGo"
     }
+}
+
+enum class GNGMode {
+    NONE, GO, NO_GO
+}
+
+enum class TestStatus {
+    TBD, SUCCESS, FAILED
 }

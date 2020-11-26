@@ -9,6 +9,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Group17_GoNoGo">
+
+
+        <activity
+            android:name=".TestResultPopUp"
+            android:label="@string/title_activity_test_result_pop_up"
+            android:theme="@style/result_popup">
+        </activity>
+
+
         <activity
             android:name=".MainActivity"
             android:label="MainActivity">
@@ -18,9 +27,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GoNoGoActivity"
-            android:label="Go No-Go Test">
-        </activity>
+        <activity
+            android:name=".GoNoGoActivity"
+            android:label="Go No-Go Test"></activity>
     </application>
 
 </manifest>
