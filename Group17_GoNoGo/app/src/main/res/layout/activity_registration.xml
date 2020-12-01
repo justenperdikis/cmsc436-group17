@@ -30,6 +30,14 @@
         android:importantForAutofill="no" />
 
     <TextView
+        android:id="@+id/password_requirements"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/grayTint"
+        android:textSize="16dp"
+        android:text="@string/password_requirements"/>
+
+    <TextView
         android:id="@+id/register_to_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

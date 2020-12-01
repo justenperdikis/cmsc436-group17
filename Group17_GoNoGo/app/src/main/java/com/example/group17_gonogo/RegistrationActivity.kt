@@ -62,7 +62,7 @@ class RegistrationActivity : AppCompatActivity(){
         val password: String = password!!.text.toString()
 
         if (!validator.validEmail(email)) {
-            Toast.makeText(applicationContext, "Please enter a valid email...", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Please enter a valid email!", Toast.LENGTH_LONG).show()
             return
         }
 

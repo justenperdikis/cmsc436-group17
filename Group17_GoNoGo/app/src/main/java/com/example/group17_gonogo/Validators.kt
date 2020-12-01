@@ -17,13 +17,15 @@ class Validators {
         return emailRegex.matches(email)
     }
 
-    // TODO: Validate password
-    // Passwords should be at least 4 characters with 1 letter and 1 number
+    // Validate password
+    // Passwords should be at least 6 characters with 1 letter and 1 number
+    // Firebase has a minimum password requirement of 6 characters
     fun validPassword(password: String?) : Boolean {
-        val passRegex = "(?=.*[0-9])(?=.*[a-z])(?=.*[a-zA-Z]).{4,8}$".toRegex()
-        if (password!!.matches(passRegex)) {
-            return true
+        if (password.isNullOrEmpty()) {
+            return false
         }
-        return false
+
+        val passwordRegex = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,8}\$")
+        return passwordRegex.matches(password)
     }
 }

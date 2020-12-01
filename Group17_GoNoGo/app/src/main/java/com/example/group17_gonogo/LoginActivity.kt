@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
             loginUserAccount()
         }
 
-        var text = "Don\'t have an account? Click here to register an account"
+        var text = "Don\'t have an account? Click here to register."
 
         var ss = SpannableString(text)
         var clickable = object: ClickableSpan() {
@@ -58,12 +58,12 @@ class LoginActivity : AppCompatActivity() {
         var pass = userPassword?.text.toString()
 
         if (email == null) {
-            Toast.makeText(applicationContext, "Please enter email!", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Please enter an email!", Toast.LENGTH_LONG).show()
             return
         }
 
         if (pass == null) {
-            Toast.makeText(applicationContext, "Please enter password!", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Please enter a password!", Toast.LENGTH_LONG).show()
             return
         }
 

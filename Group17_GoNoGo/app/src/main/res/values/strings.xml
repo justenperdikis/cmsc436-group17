@@ -7,7 +7,7 @@
     -->
     <string name="hello_world">Hello Square World!</string>
     <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="password_requirements">Password must be at least 6 characters with 1 letter and 1 number.</string>
     <string name="login_failed">"Login failed"</string>
     <string name="register_new_account">Register new account</string>
     <string name="email">Email</string>
