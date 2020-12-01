@@ -4,6 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 
@@ -20,6 +23,28 @@ class MainActivity : AppCompatActivity() {
         startButton = findViewById(R.id.start_button)
         instructionButton = findViewById(R.id.instruction_button)
         exitButton = findViewById(R.id.exit_button)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.main_option_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.login) {
+            // move to login page
+            var intent = Intent(applicationContext, LoginActivity::class.java)
+            startActivity(intent)
+        }
+
+        if (item.itemId == R.id.register) {
+            // move to register page
+            var intent = Intent(applicationContext, RegistrationActivity::class.java)
+            startActivity(intent)
+        }
+
+        return true
     }
 
     fun startTest(view: View) {

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "59185614739",
+    "firebase_url": "https://group17-gonogo.firebaseio.com",
+    "project_id": "group17-gonogo",
+    "storage_bucket": "group17-gonogo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:59185614739:android:1c3e548d87ee94ae4a2266",
+        "android_client_info": {
+          "package_name": "com.example.group17_gonogo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "59185614739-56ht6h3as9j7g9nt8elmbgqqpquj4mb2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPiLTf-bw6r0bpMupwsxz8-wicuUKeaX0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "59185614739-56ht6h3as9j7g9nt8elmbgqqpquj4mb2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
