@@ -9,6 +9,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+//import com.google.firebase.database.*
+import com.google.firebase.auth.FirebaseAuth
 import androidx.core.content.ContextCompat
 import java.util.*
 
@@ -38,13 +40,12 @@ class GoNoGoActivity: AppCompatActivity() {
 
     private var resultList = ArrayList<GNGResult>()
 
+//    private lateinit var databaseScores: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.go_no_go)
 
-        // TODO -- Create a button on block three or in the middle of block four
-        // If on block three, change text to stop and implement functionality for stopping test
-        // If on block three, make it invisible after it is pressed
         startButton = findViewById(R.id.start_button)
         reactionTestView = findViewById(R.id.block_four)
 
@@ -115,7 +116,6 @@ class GoNoGoActivity: AppCompatActivity() {
 
 
     private fun startReactionTest(view: View) {
-        val r = Random()
 
         // Test will be between 8 seconds to 17.5 seconds, as outlined in the project proposal
         // Remember that nextInt() is inclusive to the lower bound and exclusive to the upper,
@@ -126,61 +126,6 @@ class GoNoGoActivity: AppCompatActivity() {
         val testDuration = 20000                    // trial for fixed duration for 10 tests, 2 seconds long per test
 
 
-        // We set the color to red as the test begins
-        // view.setBackgroundColor(colorRed.toArgb())
-
-        // The view will not have an OnClickListener until we begin our subtests
-        // view.setOnClickListener(null)          // commented out for testing if we want user to be able to click the view when the button is red
-
-        // NEW CODE: get random color with probability 8:2
-        //changeColor()
-
-
-        // the OnClickListener for the view -- this is enabled during subtests,
-        // and currently only uses a boolean to track whether or not the user clicked the view
-        val reactionClick = View.OnClickListener {
-            wasClicked = true
-        }
-
-        // Test is comprised of subtests -- these tests will change the color of the background
-        // to the "go" color after a randomly selected interval of 1 to 3 seconds
-        // These subtests will be run for testDuration -- this is accomplished with a CountDownTimer
-
-        var timeUntilNextSubtest = generateDuration(r, 3, 1)
-        val subTestStart = System.currentTimeMillis()
-        var colorChangeStart = Long.MAX_VALUE
-
-        //Log.i(TAG, "First subTestDuration: $timeUntilNextSubtest")
-        var currInterval = 0
-
-        // The subtestTimer is nested within testTimer, and is responsible for gauging user reaction
-        // times and updating the view accordingly.
-        // If the user reacts within this time, the view is set to the "no" color and the timer
-        // is interrupted via a cancel() to indicate the user is ready for additional subtests
-        // Because the OnClickListener modifies the boolean wasClicked to be true, we need
-        // to set wasClicked to false so that future tests can use this variable
-        // If the user is not fast enough, the onFinish() will be called: it is here that
-        // the view color is changed to "no" automatically as the subtest concluded without any input
-        // TODO -- Issue a toast and determine logic for handling subtests that the user failed to react to
-        val subtestTimer = object: CountDownTimer(maxWaitTime.toLong(), 2000) {     // interval changed from 1000 to 2000
-            override fun onTick(millisUntilFinished: Long) {
-                // Log.i(TAG, "Now in subtestTimer")
-                //if (wasClicked) {
-                //    Log.i(TAG, "User reacted in time!")
-                //    view.setBackgroundColor(colorRed.toArgb())
-                //    wasClicked = false
-                //    view.setOnClickListener(null)
-                //    cancel()
-                //}
-
-            }
-
-            override fun onFinish() {
-                // Log.i(TAG, "Not fast enough!")
-                // view.setBackgroundColor(colorRed.toArgb())
-                // view.setOnClickListener(null)
-            }
-        }
 
         // The overarching CountDownTimer that is the main functionality of this activity.
         // The variable timeUntilNextSubtest dictates how many seconds will pass until the next
@@ -196,26 +141,6 @@ class GoNoGoActivity: AppCompatActivity() {
 
         val testTimer = object: CountDownTimer(testDuration.toLong(), 2000) {       // interval changed from 1000 to 2000
             override fun onTick(millisUntilFinished: Long) {
-//                Log.i(TAG, "Seconds remaining: " + millisUntilFinished/1000)
-                // Log.i(TAG, "Timing for current interval: $currInterval")
-                //if (timeUntilNextSubtest.toLong() == (currInterval++).toLong()) {
-                    // Log.i(TAG, "Changing to \"go\" color")
-                    // This is where the subtest actually begins.
-                    // Change the view color to "go" color, and wait for user input.
-                    // Create a nested timer that will countdown using maxWaitTime.
-                    // If the user reacts in time, cancel() the nested timer
-                    // TODO -- record reaction speed for each subtest
-                    // If the user is too slow, handle changing view color back to "no" color in onFinish
-                //    view.setBackgroundColor(colorGreen.toArgb())
-                //    view.setOnClickListener(reactionClick)
-                //    subtestTimer.start()                               // starting subtestTimer here, timer will be called every countDownInterval
-//                    view.setOnClickListener(null)
-                    // Regenerate subTestDuration with a function
-                 //   timeUntilNextSubtest = generateDuration(r, 3, 1)
-                 //   Log.i(TAG, "New subTestDuration: $timeUntilNextSubtest")
-                 //   currInterval = 0
-                //}
-
                 if (mode != GNGMode.NONE) {
                     if (testStatus != TestStatus.TBD) {
                         recordScore()                       // record score
@@ -231,7 +156,6 @@ class GoNoGoActivity: AppCompatActivity() {
                 // might not need this
                 // subtestTimer.start()
 
-
             }
 
             override fun onFinish() {
@@ -246,27 +170,6 @@ class GoNoGoActivity: AppCompatActivity() {
         }
         testTimer.start()
 
-        // Below is my initial proof of concept for calculating elapsed time -- this has since been
-        // drastically changed but I will leave it here in case anyone (i.e. George) wants to see it
-
-//        var timeElapsed = System.currentTimeMillis()
-//        var isGreen = true
-//        Log.i(TAG, "Initial time is $timeElapsed ms")
-//        isGreen = if (isGreen) {
-//            view.setBackgroundColor(colorRed.toArgb())
-//            Log.i(TAG, "Setting color to red/\"no\"")
-//            Log.i(TAG, "Time at press was ${System.currentTimeMillis()}")
-//            timeElapsed = System.currentTimeMillis() - timeElapsed
-//            Log.i(TAG, "Time elapsed from green to red was $timeElapsed ms")
-////                Toast.makeText(applicationContext, "User took $timeElapsed to click screen", Toast.LENGTH_LONG).show()
-//            false
-//        } else {
-//            view.setBackgroundColor(colorGreen.toArgb())
-//            Log.i(TAG, "Setting color to green/\"go\"")
-//            Log.i(TAG, "Time at press was ${System.currentTimeMillis()} ms")
-//            timeElapsed = System.currentTimeMillis()
-//            true
-//        }
     }
 
     private fun recordScore() {
@@ -285,6 +188,9 @@ class GoNoGoActivity: AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun addScore() {
+
+    }
 
     // Simple function to reduce clutter in important computations -- probably do not need this anymore
     private fun getElapsedTime(start: Long, end: Long): Long {

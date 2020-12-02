@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
@@ -54,28 +55,40 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUserAccount() {
-        var email = userEmail?.text.toString()
-        var pass = userPassword?.text.toString()
+        progressBar.visibility = View.VISIBLE
 
-        if (email == null) {
+        val email: String = userEmail?.text.toString()
+        var password: String = userPassword?.text.toString()
+
+        if (TextUtils.isEmpty(email)) {
             Toast.makeText(applicationContext, "Please enter an email!", Toast.LENGTH_LONG).show()
             return
         }
 
-        if (pass == null) {
+        if (TextUtils.isEmpty(password)) {
             Toast.makeText(applicationContext, "Please enter a password!", Toast.LENGTH_LONG).show()
             return
         }
 
-        mAuth!!.signInWithEmailAndPassword(email, pass).addOnCompleteListener() {
-            if (it.isSuccessful) {
-               Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_LONG).show()
-                var intent = Intent(this, MainActivity::class.java)
-                // intent.putExtra(USER_ID, mAuth!!.currentUser?.uid)
-                startActivity(intent)
-            } else {
-                Toast.makeText(applicationContext,"Login failed! Please try again later.", Toast.LENGTH_LONG).show()
+        mAuth!!.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener {
+                progressBar.visibility = View.GONE
+                if (it.isSuccessful) {
+                   Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_LONG)
+                       .show()
+                    var intent = Intent(this@LoginActivity, MainActivity::class.java)
+                    // intent.putExtra(USER_ID, mAuth!!.currentUser?.uid)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        "Login failed! Please try again later.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
-        }
+        // use mAuth!!.currentUser != null to ensure that someone is signed in
+        // this is how we will check for a user being signed in
+        // in our GoNoGoActivity
     }
 }

@@ -6,10 +6,12 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
 class RegistrationActivity : AppCompatActivity(){
 
@@ -22,11 +24,15 @@ class RegistrationActivity : AppCompatActivity(){
 
     private var mAuth: FirebaseAuth? = null
 
+//    private lateinit var databaseUsers: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
 
         mAuth = FirebaseAuth.getInstance()
+
+//        databaseUsers = FirebaseDatabase.getInstance().getReference("users")
 
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
@@ -54,6 +60,15 @@ class RegistrationActivity : AppCompatActivity(){
         registerToLogin.movementMethod = LinkMovementMethod.getInstance()
     }
 
+    override fun onStart() {
+        super.onStart()
+//        databaseUsers.addValueEventListener(object: ValueEventListener {
+//          override fun onDataChange(dataSnapshot: DataSnapshot) {
+//
+//          }
+//        })
+    }
+
     private fun registerNewUser() {
         // register for new user
         progressBar!!.visibility = View.VISIBLE
@@ -73,16 +88,17 @@ class RegistrationActivity : AppCompatActivity(){
 
         mAuth!!.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
+                    progressBar!!.visibility = View.GONE
                     if (task.isSuccessful) {
                         Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_LONG).show()
-                        progressBar!!.visibility = View.GONE
-
+//                        val id = databaseUsers.child(mAuth!!.uid!!).push().key
+//                        val user = User(id!!, email)
+//                        databaseUsers.child(mAuth!!.uid!!).child(id).setValue(user)
                         // move to login page
                         val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
                         startActivity(intent)
                     } else {
                         Toast.makeText(applicationContext, "Registration failed! Please try again later", Toast.LENGTH_LONG).show()
-                        progressBar!!.visibility = View.GONE
                     }
                 }
     }
