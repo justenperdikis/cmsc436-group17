@@ -61,6 +61,16 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mAuth.currentUser == null) {
+            // Log.i(TAG, "onResume called with no user")
+        } else {
+            // Log.i(TAG, "onResume called with user ${mAuth.currentUser!!.uid}")
+        }
+
+    }
+
     fun startTest(view: View) {
 //        Log.i(TAG, "Entered startTest()")
 

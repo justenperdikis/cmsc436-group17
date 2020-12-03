@@ -15,4 +15,5 @@
     <string name="password">Password</string>
     <string name="register">Register</string>
     <string name="account_login">Account Login</string>
+    <string name="test_result_text">Test Result</string>
 </resources>

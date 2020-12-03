@@ -57,6 +57,7 @@ class GoNoGoActivity: AppCompatActivity() {
 
         startButton.setOnClickListener {
             startReactionTest(reactionTestView)
+            resultList.clear()                          // clear the result list so the previous test result will not get brought over to the next test
             startButton.isEnabled = false
 
         }
@@ -178,8 +179,7 @@ class GoNoGoActivity: AppCompatActivity() {
         // Log.i(TAG, "Mode: $mode, Test status: $testStatus")
         var result = GNGResult(reactTime, mode, testStatus)     // Create a GNGResult object with the values obtained from last test
         resultList.add(result)                                  // add result to the arraylist
-        testStatus =
-            TestStatus.TBD                             // reset the status for the next test
+        testStatus = TestStatus.TBD                             // reset the status for the next test
         wasClicked = false                                      // reset the value for the next test
         goProbability -= 0.02f                                  // increase the chance of No-Go appear as the test goes on, might need to adjust the number later
     }

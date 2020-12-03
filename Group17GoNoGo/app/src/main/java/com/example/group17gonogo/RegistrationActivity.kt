@@ -82,6 +82,7 @@ class RegistrationActivity : AppCompatActivity(){
                         // move to login page
                         val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
                         startActivity(intent)
+                        finish()
                     } else {
                         Toast.makeText(applicationContext, "Registration failed! Please try again later", Toast.LENGTH_LONG).show()
                     }

@@ -81,9 +81,10 @@ class LoginActivity : AppCompatActivity() {
                    Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_LONG)
                        .show()
                     addUser(email)
-                    var intent = Intent(this@LoginActivity, MainActivity::class.java)
+                    finish()
+                    //var intent = Intent(this@LoginActivity, MainActivity::class.java)
                     // intent.putExtra(USER_ID, mAuth!!.currentUser?.uid)
-                    startActivity(intent)
+                    //startActivity(intent)
                 } else {
                     Toast.makeText(
                         applicationContext,
