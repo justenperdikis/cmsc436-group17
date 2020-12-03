@@ -9,12 +9,16 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var startButton: Button
     private lateinit var instructionButton: Button
     private lateinit var exitButton: Button
+
+    private var mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +46,16 @@ class MainActivity : AppCompatActivity() {
             // move to register page
             var intent = Intent(applicationContext, RegistrationActivity::class.java)
             startActivity(intent)
+        }
+
+        if (item.itemId == R.id.logout) {
+            if (mAuth.currentUser != null) {
+                mAuth.signOut()
+                Toast.makeText(applicationContext, "Current user logged out.", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(applicationContext, "No user currently logged in.", Toast.LENGTH_LONG).show()
+            }
+
         }
 
         return true

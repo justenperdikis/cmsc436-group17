@@ -3,7 +3,9 @@ package com.example.group17gonogo
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -14,12 +16,16 @@ class InstructionsActivity : AppCompatActivity() {
     private lateinit var mButtonSunny: Button
     private lateinit var mButtonFoggy: Button
 
-    private val mRootRef = FirebaseDatabase.getInstance().getReference()
+    private val mRootRef = FirebaseDatabase.getInstance().reference
     private val mConditionRef = mRootRef.child("condition")
+
+    private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_instructions)
+
+        mAuth = FirebaseAuth.getInstance()
 
         mConditionTextView = findViewById(R.id.textViewCondition)
         mButtonSunny = findViewById(R.id.buttonSunny)

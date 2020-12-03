@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
 
@@ -21,6 +22,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginToRegister: TextView
     private lateinit var loginBtn: Button
     private lateinit var progressBar: ProgressBar
+
+    private val mRootRef = FirebaseDatabase.getInstance().reference
+    private val mUserRef = mRootRef.child("users")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +80,7 @@ class LoginActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                    Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_LONG)
                        .show()
+                    addUser(email)
                     var intent = Intent(this@LoginActivity, MainActivity::class.java)
                     // intent.putExtra(USER_ID, mAuth!!.currentUser?.uid)
                     startActivity(intent)
@@ -90,5 +95,15 @@ class LoginActivity : AppCompatActivity() {
         // use mAuth!!.currentUser != null to ensure that someone is signed in
         // this is how we will check for a user being signed in
         // in our GoNoGoActivity
+    }
+
+    private fun addUser(email: String) {
+        if (mAuth?.currentUser != null) {
+            Toast.makeText(applicationContext, "User currently logged in", Toast.LENGTH_LONG).show()
+            val uid = mAuth!!.uid as String
+//                val id = mUserRef.child(uid).push().key
+            val user = User(uid, email)
+            mUserRef.child(uid).setValue(user)
+        }
     }
 }

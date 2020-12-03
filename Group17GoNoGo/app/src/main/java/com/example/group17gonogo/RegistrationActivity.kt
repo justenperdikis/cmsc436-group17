@@ -24,9 +24,6 @@ class RegistrationActivity : AppCompatActivity(){
 
     private var mAuth: FirebaseAuth? = null
 
-    private val mRootRef = FirebaseDatabase.getInstance().getReference()
-    private val mTestRef = mRootRef.child("test")
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
@@ -59,21 +56,6 @@ class RegistrationActivity : AppCompatActivity(){
         registerToLogin.movementMethod = LinkMovementMethod.getInstance()
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//
-//        mTestRef.addValueEventListener(object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                val text = snapshot.value as String
-//                regBtn.text = text
-//                Log.i("GoNoGo", "Data changed")
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                TODO("Not yet implemented")
-//            }
-//        })
-//    }
 
     private fun registerNewUser() {
         // register for new user
@@ -97,10 +79,6 @@ class RegistrationActivity : AppCompatActivity(){
                     progressBar!!.visibility = View.GONE
                     if (task.isSuccessful) {
                         Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_LONG).show()
-//                        val id = databaseUsers.child(mAuth!!.uid!!).push().key
-//                        val user = User(id!!, email)
-//                        databaseUsers.child(mAuth!!.uid!!).child(id).setValue(user)
-
                         // move to login page
                         val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
                         startActivity(intent)
