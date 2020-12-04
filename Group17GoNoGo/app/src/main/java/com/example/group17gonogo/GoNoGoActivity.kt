@@ -1,7 +1,11 @@
 package com.example.group17gonogo
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.SoundPool
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -40,11 +44,17 @@ class GoNoGoActivity: AppCompatActivity() {
 
     private var resultList = ArrayList<GNGResult>()
 
+    private var mSoundPool: SoundPool? = null
+    private var mSoundId: Int = 0
+    private lateinit var mAudioManager: AudioManager
+
 //    private lateinit var databaseScores: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.go_no_go)
+
+        mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         startButton = findViewById(R.id.start_button)
         reactionTestView = findViewById(R.id.block_four)
@@ -56,6 +66,9 @@ class GoNoGoActivity: AppCompatActivity() {
         colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
 
         startButton.setOnClickListener {
+            startPlayback()
+            Log.i(TAG, "Play start sound")
+
             startReactionTest(reactionTestView)
             resultList.clear()                          // clear the result list so the previous test result will not get brought over to the next test
             startButton.isEnabled = false
@@ -69,8 +82,9 @@ class GoNoGoActivity: AppCompatActivity() {
     }
 
     private fun changeColor() {
-        var rand = (0..100).random()                                    // generate random number between 0 and 100
+        mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
 
+        var rand = (0..100).random()                                    // generate random number between 0 and 100
         var ngBound = 100 * noGoProbability
 
         if (rand <= ngBound) {
@@ -207,6 +221,30 @@ class GoNoGoActivity: AppCompatActivity() {
 
     companion object {
         const val TAG = "GoNoGo"
+    }
+
+    private fun startPlayback() {
+
+
+        mSoundPool?.play(
+                mSoundId, 10f, 10f, 1, 0, 1.0f
+        )
+        Log.i(TAG, "Starting playback in startPlayback()")
+    }
+
+    private fun loadSoundPool() {
+        // Create a SoundPool
+        val audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .build()
+        mSoundPool = SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                .build()
+
+        mSoundPool?.apply {
+            // Load bubble popping sound into the SoundPool
+            mSoundId = load(this@GoNoGoActivity, R.raw.ding_harsh, 1)
+        }
     }
 }
 

@@ -9,6 +9,12 @@
     <item android:id="@+id/register"
         android:title="Register"/>
 
+    <item android:id="@+id/change_theme"
+        android:title="Change Theme"/>
+
+    <item android:id="@+id/more_info"
+        android:title="More Information"/>
+
     <item android:id="@+id/logout"
         android:title="Logout"/>
 

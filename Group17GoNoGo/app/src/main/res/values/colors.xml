@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_250">#A75FFF</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
@@ -10,6 +11,8 @@
     <color name="divider">#000000</color>
     <color name="gray">#8C8C8C</color>
     <color name="grayTint">#408C8C8C</color>
-    <color name="green">#4CAF50</color>
-    <color name="red">#C3190C</color>
+    <color name="green">#07C60E</color>
+    <color name="dark_green">#004903</color>
+    <color name="red">#BD0D00</color>
+    <color name="dark_red">#630801</color>
 </resources>
