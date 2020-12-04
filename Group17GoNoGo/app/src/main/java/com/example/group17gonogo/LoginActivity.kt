@@ -80,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                    Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_LONG)
                        .show()
-                    addUser(email)
+                    //addUser(email)        //moved to RegistrationActivity
                     finish()
                     //var intent = Intent(this@LoginActivity, MainActivity::class.java)
                     // intent.putExtra(USER_ID, mAuth!!.currentUser?.uid)
@@ -98,6 +98,7 @@ class LoginActivity : AppCompatActivity() {
         // in our GoNoGoActivity
     }
 
+    // moved to RegistrationActivity
     private fun addUser(email: String) {
         if (mAuth?.currentUser != null) {
             Toast.makeText(applicationContext, "User currently logged in", Toast.LENGTH_LONG).show()

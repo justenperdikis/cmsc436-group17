@@ -28,4 +28,11 @@ class Validators {
         val passwordRegex = Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,8}\$")
         return passwordRegex.matches(password)
     }
+
+    fun validUsername(username: String?) : Boolean {
+        if (username!!.length >= 4 && username.length < 32 ) {
+            return true
+        }
+        return false
+    }
 }

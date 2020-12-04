@@ -10,6 +10,7 @@
     <string name="password_requirements">Password must be at least 6 characters with 1 letter and 1 number.</string>
     <string name="login_failed">"Login failed"</string>
     <string name="register_new_account">Register new account</string>
+    <string name="username">Username</string>
     <string name="email">Email</string>
     <string name="login">Login</string>
     <string name="password">Password</string>

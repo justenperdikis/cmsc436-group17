@@ -9,13 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Group17GoNoGo">
+        <activity android:name=".LeaderboardActivity"></activity>
         <activity
             android:name=".TestResultPopUp"
             android:label="@string/title_activity_test_result_pop_up"
-            android:theme="@style/result_popup">
-        </activity>
-
-        <activity android:name=".RegistrationActivity"></activity>
+            android:theme="@style/result_popup"></activity>
+        <activity android:name=".RegistrationActivity" />
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".MainActivity"
@@ -28,9 +27,8 @@
         </activity>
         <activity
             android:name=".GoNoGoActivity"
-            android:label="Go No-Go Test"></activity>
-
-        <activity android:name=".InstructionsActivity"/>
+            android:label="Go No-Go Test" />
+        <activity android:name=".InstructionsActivity" />
     </application>
 
 </manifest>

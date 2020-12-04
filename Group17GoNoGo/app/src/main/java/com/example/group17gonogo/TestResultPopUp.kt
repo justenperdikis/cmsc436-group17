@@ -11,17 +11,21 @@ import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.widget.Button
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import org.w3c.dom.Text
+import java.lang.Exception
 import java.util.ArrayList
 
 class TestResultPopUp : Activity() {
 
     private lateinit var resultTextView: TextView
     private lateinit var noticeTextView: TextView
+    private lateinit var showLeaderboardButton: Button
     private var mAuth: FirebaseAuth? = null
     private var totalScore: Long = 0
 
@@ -31,9 +35,11 @@ class TestResultPopUp : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.test_result_pop_up)
+
         Log.i(TAG, "Entered pop up onCreate")
 
         noticeTextView = findViewById(R.id.notice_text)
+        showLeaderboardButton = findViewById(R.id.leaderboard_button)
         resultTextView = findViewById(R.id.result_text_view)
         // set the textView to have a vertical scrollbar
         resultTextView.movementMethod = ScrollingMovementMethod()
@@ -47,6 +53,11 @@ class TestResultPopUp : Activity() {
         window.attributes = windowParams
 
         showResult(intent.getSerializableExtra("result") as ArrayList<GNGResult>)
+
+        showLeaderboardButton.setOnClickListener() {
+            var intent = Intent(applicationContext, LeaderboardActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun showResult(list: ArrayList<GNGResult>) {
@@ -78,9 +89,12 @@ class TestResultPopUp : Activity() {
         if (mAuth!!.currentUser != null) {
             Log.i(TAG, "A user is logged in")
             addScore(totalScore)
-            compareScore()
+            noticeTextView.visibility = View.GONE
+            showLeaderboardButton.visibility = View.VISIBLE
         } else {
             Log.i(TAG, "No user is logged in")
+            showLeaderboardButton.visibility = View.GONE
+            noticeTextView.visibility = View.VISIBLE
             setNotice()
 
         }
@@ -89,7 +103,7 @@ class TestResultPopUp : Activity() {
     }
 
     private fun setNotice() {
-        var text = "Login here to compare your score with other players!"
+        var text = "Login here to see the leaderboard!"
 
         var ss = SpannableString(text)
         var clickable = object: ClickableSpan() {
@@ -106,21 +120,45 @@ class TestResultPopUp : Activity() {
     }
 
     private fun compareScore() {
+        //var test = mRootRef.orderByChild("scores")
+
+
         noticeTextView.setText("Need to compare score here")
     }
 
     private fun addScore(score: Long) {
         val uid = mAuth!!.uid as String
-        val score = Score(uid, score.toInt())
 
-        mScoreRef.child(uid).setValue(score)
+        // trying to query the username out of "users" database
+        val mUserRef = mRootRef.child("users")
+        val currUser = mUserRef.child(uid).child("userId")
+
+        currUser.addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var username = snapshot.getValue().toString()
+
+                // record the data inside onDataChange because it took time to access database and query the username
+                val score = Score(username, score.toInt())
+                mScoreRef.child(uid).setValue(score)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+
     }
 
     override fun onResume() {
         super.onResume()
         if (mAuth!!.currentUser != null) {
             addScore(totalScore)                // add the score to the database of the newly logged in user
-            compareScore()                      // compare the user score with other users
+            noticeTextView.visibility = View.GONE
+            showLeaderboardButton.visibility = View.VISIBLE
+        } else {
+            showLeaderboardButton.visibility = View.GONE
+            noticeTextView.visibility = View.VISIBLE
+            setNotice()
         }
     }
 

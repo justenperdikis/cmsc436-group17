@@ -15,6 +15,7 @@ import com.google.firebase.database.*
 
 class RegistrationActivity : AppCompatActivity(){
 
+    private lateinit var username: EditText
     private lateinit var email: EditText
     private lateinit var password: EditText
     private lateinit var regBtn: Button
@@ -24,12 +25,18 @@ class RegistrationActivity : AppCompatActivity(){
 
     private var mAuth: FirebaseAuth? = null
 
+    //-----------test------------
+    private val mRootRef = FirebaseDatabase.getInstance().reference
+    private val mUserRef = mRootRef.child("users")
+    // ------------------------
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
 
         mAuth = FirebaseAuth.getInstance()
 
+        username = findViewById(R.id.username)
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
         regBtn = findViewById(R.id.register)
@@ -63,6 +70,12 @@ class RegistrationActivity : AppCompatActivity(){
 
         val email: String = email!!.text.toString()
         val password: String = password!!.text.toString()
+        val username: String = username!!.text.toString()
+
+        if (!validator.validUsername(username)) {
+            Toast.makeText(applicationContext, "Please enter a valid username!", Toast.LENGTH_LONG).show()
+            return
+        }
 
         if (!validator.validEmail(email)) {
             Toast.makeText(applicationContext, "Please enter a valid email!", Toast.LENGTH_LONG).show()
@@ -81,11 +94,25 @@ class RegistrationActivity : AppCompatActivity(){
                         Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_LONG).show()
                         // move to login page
                         val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
+                        //----------------------test ---------
+                        addUser(email, username)
+                        //-------------------------------------
                         startActivity(intent)
                         finish()
                     } else {
                         Toast.makeText(applicationContext, "Registration failed! Please try again later", Toast.LENGTH_LONG).show()
                     }
                 }
+    }
+
+    // --------------------------------- test -------------------------------
+    private fun addUser(email: String, username: String) {
+        if (mAuth?.currentUser != null) {
+            Toast.makeText(applicationContext, "User currently logged in", Toast.LENGTH_LONG).show()
+            val uid = mAuth!!.uid as String
+//                val id = mUserRef.child(uid).push().key
+            val user = User(username, email)
+            mUserRef.child(uid).setValue(user)
+        }
     }
 }
