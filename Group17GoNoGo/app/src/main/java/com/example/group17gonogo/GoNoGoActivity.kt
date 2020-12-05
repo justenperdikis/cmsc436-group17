@@ -26,6 +26,7 @@ class GoNoGoActivity: AppCompatActivity() {
     private lateinit var colorGreen: Color
     private lateinit var colorRed: Color
     private lateinit var colorGray: Color
+    private lateinit var colorBlack: Color
 
     private val maxWaitTime = 2000          // moved up from startReactionTest
 
@@ -54,8 +55,9 @@ class GoNoGoActivity: AppCompatActivity() {
     private var hasStarted: Boolean = false
     private var numOfTest: Int = 20
     private var currNumOfTest: Int = 0
+    private var transitionLength: Long =300
 
-    private lateinit var timer: CountDownTimer
+    private var timer: CountDownTimer? = null
 
     // -----------------------------------------
 
@@ -73,6 +75,7 @@ class GoNoGoActivity: AppCompatActivity() {
         colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
         colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
         colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
+        colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
 
         startButton.setOnClickListener {
             startPlayback()
@@ -101,7 +104,9 @@ class GoNoGoActivity: AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        timer.cancel()
+        if (timer != null) {
+            timer!!.cancel()
+        }
         finish()
     }
 
@@ -119,21 +124,24 @@ class GoNoGoActivity: AppCompatActivity() {
             goProbability = 0.8f                                    // reset the probability to original
             reactionTestView.isClickable = true                     // make the TextView clickable
             hasStarted = true
+            startTime = System.currentTimeMillis()
             startGame()
         } else {
             Log.i(TAG, "Ongoing game, change color")
             if (currNumOfTest < numOfTest) {
-                timer.cancel()                                     // end current timer
+                timer!!.cancel()                                     // end current timer
                 goProbability -= 0.01f                             // increase the probability of no-go appearing as the test goes
 
                 // get the score value
                 var result = getScore()                 // get the score if the user pressed the screen before the timer ends
                 resultList.add(result)                            // record the current test result
-                changeColor()                                     // change the color if RNGesus allows
+                //changeColor()                                     // change the color if RNGesus allows
+                testTransition()
 
                 currNumOfTest += 1                                // increase the number of test done
-                timer.start()                                     // start new timer for the next test
+                timer!!.start()                                     // start new timer for the next test
             } else {
+                reactionTestView.isClickable = false
                 gameComplete()
             }
         }
@@ -155,14 +163,36 @@ class GoNoGoActivity: AppCompatActivity() {
                 currNumOfTest += 1                                                              // increase the number of test done
                 if (currNumOfTest < numOfTest) {                                                // check if game is complete or not
                     goProbability -= 0.01f                                                      // increase the probability of no-go appearing as the test goes
-                    changeColor()                                                               // change the color if RNGesus allows
-                    timer.start()                                                               // start the timer again if the user did not click at all
+                    //changeColor()                                                               // change the color if RNGesus allows
+                    testTransition()
+                    timer!!.start()                                                               // start the timer again if the user did not click at all
                 } else {
+                    reactionTestView.isClickable = false
                     gameComplete()                                                              // reached the max num of test, end the test
                 }
             }
         }
-        timer.start()
+        timer!!.start()
+    }
+
+    private fun testTransition() {
+        var transitionTimer: CountDownTimer = object: CountDownTimer(transitionLength, transitionLength) {
+            override fun onTick(p0: Long) {
+                // change the bg to black
+                reactionTestView.isClickable = false                            // player shouldn't be able to interact with black screen
+                startTime = System.currentTimeMillis()
+                reactionTestView.setBackgroundColor(colorBlack.toArgb())
+                reactionTestView.text = ""
+            }
+
+            override fun onFinish() {
+                // call changeColor
+                changeColor()
+                reactionTestView.isClickable = true
+            }
+
+        }
+        transitionTimer.start()
     }
 
     // simmilar to getStatus
@@ -195,7 +225,6 @@ class GoNoGoActivity: AppCompatActivity() {
         currNumOfTest = 0                                                                   // reset the num of test counter
         // show player test result
         reactionTestView.setBackgroundColor(colorGray.toArgb())
-        reactionTestView.isClickable = false
         startButton.text = "Retry?"
         hasStarted = false
         showResult()
@@ -206,10 +235,6 @@ class GoNoGoActivity: AppCompatActivity() {
 
     private fun changeColor() {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
-
-        // ---------- score bug fix test ---------------
-        startTime = System.currentTimeMillis()
-        // ---------------------------------------------
 
         var rand = (0..100).random()                                    // generate random number between 0 and 100
         var ngBound = 100 * noGoProbability
@@ -324,6 +349,11 @@ class GoNoGoActivity: AppCompatActivity() {
     }
 
     private fun showResult() {
+        // make sure to stops any unintended timer before showing the test result
+        timer!!.cancel()
+        reactionTestView.setBackgroundColor(colorGray.toArgb())
+        reactionTestView.text = ""
+
         // create intent to pass the result list to popup activity
         val intent = Intent(applicationContext, TestResultPopUp::class.java)
         intent.putExtra("result", resultList)
