@@ -50,6 +50,15 @@ class GoNoGoActivity: AppCompatActivity() {
 
 //    private lateinit var databaseScores: DatabaseReference
 
+    // --------------score bug fix test var----------------
+    private var hasStarted: Boolean = false
+    private var numOfTest: Int = 20
+    private var currNumOfTest: Int = 0
+
+    private lateinit var timer: CountDownTimer
+
+    // -----------------------------------------
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.go_no_go)
@@ -69,25 +78,143 @@ class GoNoGoActivity: AppCompatActivity() {
             startPlayback()
             Log.i(TAG, "Play start sound")
 
-            startReactionTest(reactionTestView)
-            resultList.clear()                          // clear the result list so the previous test result will not get brought over to the next test
+            //startReactionTest(reactionTestView)
+            //resultList.clear()                          // clear the result list so the previous test result will not get brought over to the next test
             startButton.isEnabled = false
 
+            // ---------- score bug fix test ---------------
+            buttonPressed()
+            // ---------------------------------------------
+
         }
 
-        reactionTestView.setOnClickListener() {
-            getStatus()
+        // ---------- score bug fix test ---------------
+        reactionTestView.setOnClickListener {
+            Log.i(TAG, "reactionTestView clicked")
+            buttonPressed()
         }
+        // ---------------------------------------------
 
     }
+
+    // ---------- score bug fix test ---------------
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        timer.cancel()
+        finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startButton.isEnabled = true
+    }
+
+    private fun buttonPressed() {
+        mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
+
+        if (!hasStarted) {
+            Log.i(TAG, "Start game")
+            // start the game
+            goProbability = 0.8f                                    // reset the probability to original
+            reactionTestView.isClickable = true                     // make the TextView clickable
+            hasStarted = true
+            startGame()
+        } else {
+            Log.i(TAG, "Ongoing game, change color")
+            if (currNumOfTest < numOfTest) {
+                timer.cancel()                                     // end current timer
+                goProbability -= 0.01f                             // increase the probability of no-go appearing as the test goes
+
+                // get the score value
+                var result = getScore()                 // get the score if the user pressed the screen before the timer ends
+                resultList.add(result)                            // record the current test result
+                changeColor()                                     // change the color if RNGesus allows
+
+                currNumOfTest += 1                                // increase the number of test done
+                timer.start()                                     // start new timer for the next test
+            } else {
+                gameComplete()
+            }
+        }
+    }
+
+    private fun startGame() {
+        changeColor()                                                                           // get the first color
+
+        timer = object: CountDownTimer(maxWaitTime.toLong(), maxWaitTime.toLong()) {          // create timer that run for 2 second
+            override fun onTick(millisUntilFinished: Long) {
+                // Do nothing
+            }
+
+            override fun onFinish() {                                                           // executed when timer is finished
+                // get the score value
+                var result = getScore()
+                resultList.add(result)                                                          // record the current test result
+
+                currNumOfTest += 1                                                              // increase the number of test done
+                if (currNumOfTest < numOfTest) {                                                // check if game is complete or not
+                    goProbability -= 0.01f                                                      // increase the probability of no-go appearing as the test goes
+                    changeColor()                                                               // change the color if RNGesus allows
+                    timer.start()                                                               // start the timer again if the user did not click at all
+                } else {
+                    gameComplete()                                                              // reached the max num of test, end the test
+                }
+            }
+        }
+        timer.start()
+    }
+
+    // simmilar to getStatus
+    private fun getScore() : GNGResult {
+        var time = getElapsedTime(startTime, System.currentTimeMillis())
+        Log.i(TAG, "starttime: ${startTime}, time: $time , current time: ${System.currentTimeMillis()}")
+        if (mode == GNGMode.GO) {
+            if (time < maxWaitTime) {
+                testStatus = TestStatus.SUCCESS
+            } else {
+                testStatus = TestStatus.FAILED
+                time = 2000
+            }
+        } else {
+            if (time >= maxWaitTime) {
+                testStatus = TestStatus.SUCCESS
+                time = 2000
+            } else {
+                testStatus = TestStatus.FAILED
+            }
+        }
+
+        var result = GNGResult(time, this.mode, testStatus)
+
+        return result
+    }
+
+    private fun gameComplete() {
+        Log.i(TAG, "Game complete")
+        currNumOfTest = 0                                                                   // reset the num of test counter
+        // show player test result
+        reactionTestView.setBackgroundColor(colorGray.toArgb())
+        reactionTestView.isClickable = false
+        startButton.text = "Retry?"
+        hasStarted = false
+        showResult()
+        resultList.clear()
+    }
+
+    // -----------------------------------------------------
 
     private fun changeColor() {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
 
+        // ---------- score bug fix test ---------------
+        startTime = System.currentTimeMillis()
+        // ---------------------------------------------
+
         var rand = (0..100).random()                                    // generate random number between 0 and 100
         var ngBound = 100 * noGoProbability
 
-        if (rand <= ngBound) {
+        if (rand < ngBound) {
             mode =
                 GNGMode.NO_GO                                        // record the test is currently showing a No-Go
             reactionTestView.setBackgroundColor(colorRed.toArgb())
@@ -141,8 +268,6 @@ class GoNoGoActivity: AppCompatActivity() {
         //Log.i(TAG, "Test will be $testDuration milliseconds long")
 
         val testDuration = 20000                    // trial for fixed duration for 10 tests, 2 seconds long per test
-
-
 
         // The overarching CountDownTimer that is the main functionality of this activity.
         // The variable timeUntilNextSubtest dictates how many seconds will pass until the next
@@ -205,10 +330,6 @@ class GoNoGoActivity: AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun addScore() {
-
-    }
-
     // Simple function to reduce clutter in important computations -- probably do not need this anymore
     private fun getElapsedTime(start: Long, end: Long): Long {
         return (end - start)
@@ -224,8 +345,6 @@ class GoNoGoActivity: AppCompatActivity() {
     }
 
     private fun startPlayback() {
-
-
         mSoundPool?.play(
                 mSoundId, 10f, 10f, 1, 0, 1.0f
         )

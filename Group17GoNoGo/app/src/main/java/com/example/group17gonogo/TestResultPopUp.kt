@@ -54,6 +54,7 @@ class TestResultPopUp : Activity() {
 
         showResult(intent.getSerializableExtra("result") as ArrayList<GNGResult>)
 
+
         showLeaderboardButton.setOnClickListener() {
             var intent = Intent(applicationContext, LeaderboardActivity::class.java)
             startActivity(intent)
@@ -72,7 +73,7 @@ class TestResultPopUp : Activity() {
             resultText += singleResult
 
             if (result.getGNGMode() == GNGMode.GO && result.getTestStatus() == TestStatus.SUCCESS) {
-                totalScore += result.getReactTime()
+                totalScore += (2000 - result.getReactTime())
             } else if (result.getGNGMode() == GNGMode.NO_GO && result.getTestStatus() == TestStatus.SUCCESS) {
                 totalScore += 1000
             } else {

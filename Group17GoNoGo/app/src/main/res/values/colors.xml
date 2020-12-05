@@ -15,4 +15,10 @@
     <color name="dark_green">#004903</color>
     <color name="red">#BD0D00</color>
     <color name="dark_red">#630801</color>
+    <!-- complementary color currently used in splash screen -->
+    <color name="splash_green1">#499441</color>
+    <color name="splash_green2">#ACFFA3</color>
+    <color name="splash_green3">#83E078</color>
+    <color name="splash_purple">#943271</color>
+    <color name="splash_pinkish">#E079BC</color>
 </resources>

@@ -9,21 +9,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Group17GoNoGo">
-        <activity android:name=".LeaderboardActivity"></activity>
+        <activity android:name=".SplashScreen">            <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter></activity>
+        <activity android:name=".LeaderboardActivity" />
         <activity
             android:name=".TestResultPopUp"
             android:label="@string/title_activity_test_result_pop_up"
-            android:theme="@style/result_popup"></activity>
+            android:theme="@style/result_popup" />
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".MainActivity"
             android:label="MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".GoNoGoActivity"
