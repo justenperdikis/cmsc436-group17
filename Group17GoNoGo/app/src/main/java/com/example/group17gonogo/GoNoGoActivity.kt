@@ -67,7 +67,7 @@ class GoNoGoActivity: AppCompatActivity() {
 
         mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        startButton = findViewById(R.id.start_button)
+        startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
 
         // May add accessibility option for colorblind users -- if so, will need to change var names

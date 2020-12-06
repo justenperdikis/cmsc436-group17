@@ -13,50 +13,50 @@
         android:text="Go No-GO"
         android:textSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintVertical_bias="0.183" />
 
     <Button
-        android:id="@+id/start_button"
+        android:id="@+id/goNoGoStart_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="startTest"
-        android:text="Start Test"
-        app:layout_constraintBottom_toTopOf="@id/instruction_button"
+        android:layout_marginTop="10dp"
+        android:onClick="startGoNoGo"
+        android:text="Go-No Go Test"
+        app:layout_constraintBottom_toTopOf="@id/reactionTest_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView"
-        app:layout_constraintVertical_bias="0.529" />
+        />
 
     <Button
-        android:id="@+id/instruction_button"
+        android:id="@+id/reactionTest_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="168dp"
-        android:onClick="showInstructions"
-        android:text="Instruction"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="10dp"
+        android:onClick="startReactionTest"
+        android:text="Simple Reaction Test"
+        app:layout_constraintBottom_toTopOf="@id/exit_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView"
-        app:layout_constraintVertical_bias="0.129" />
+        app:layout_constraintTop_toBottomOf="@id/goNoGoStart_button"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/exit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:onClick="exitApp"
         android:text="Exit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView"
+        app:layout_constraintTop_toBottomOf="@id/reactionTest_button"
         app:layout_constraintVertical_bias="0.687" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

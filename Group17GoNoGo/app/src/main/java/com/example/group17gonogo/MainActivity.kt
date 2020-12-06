@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity() {
 
         mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        startButton = findViewById(R.id.start_button)
-        instructionButton = findViewById(R.id.instruction_button)
+        startButton = findViewById(R.id.goNoGoStart_button)
+        instructionButton = findViewById(R.id.reactionTest_button)
         exitButton = findViewById(R.id.exit_button)
     }
 
@@ -114,25 +114,26 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun startTest(view: View) {
+    fun startGoNoGo(view: View) {
 //        Log.i(TAG, "Entered startTest()")
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
 
-        val mTestIntent = Intent(
+        val mGoNoGoIntent = Intent(
             this@MainActivity,
             GoNoGoActivity::class.java)
 
-        startActivity(mTestIntent)
+        startActivity(mGoNoGoIntent)
     }
 
-    fun showInstructions(view: View) {
-//        Log.i(TAG, "Entered showInstructions()")
+    fun startReactionTest(view: View) {
+//        Log.i(TAG, "Entered startReactionTest()")
+        mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
         //Show content of instructions
-        val mInstructionIntent = Intent(
+        val mReactionTestIntent = Intent(
             this@MainActivity,
-            InstructionsActivity::class.java)
+            ReactionActivity::class.java)
 
-        startActivity(mInstructionIntent)
+        startActivity(mReactionTestIntent)
     }
     fun exitApp(view: View) {
         super.onBackPressed()
