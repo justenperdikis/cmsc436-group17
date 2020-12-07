@@ -40,6 +40,7 @@ class ReactionActivity: AppCompatActivity() {
 
     // test var
     var wasClicked = false
+    var testDone = false
     private var startTime: Long = 0
     private var resultList = ArrayList<GNGResult>()
 
@@ -126,6 +127,7 @@ class ReactionActivity: AppCompatActivity() {
 
     private fun startReactionTest(view: TextView) {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
+        testDone = false
         view.text = "Get ready..."
 
         val r = Random()
@@ -171,25 +173,29 @@ class ReactionActivity: AppCompatActivity() {
         val subtestTimer = object: CountDownTimer(maxWaitTime.toLong(), 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 //Log.i(TAG, "Now in subtestTimer")
-                if (wasClicked) {
-                    Log.i(TAG, "User reacted in time!")
-                    view.setBackgroundColor(colorGray.toArgb())
-                    view.text = "Good!"
-                    wasClicked = false
-                    view.setOnClickListener(null)
-                    // The user reacted in time, so we add a successful test to the resultlist
-                    addResult(true)
-                    cancel()
+                if (!testDone) {
+                    if (wasClicked) {
+                        Log.i(TAG, "User reacted in time!")
+                        view.setBackgroundColor(colorGray.toArgb())
+                        view.text = "Good!"
+                        wasClicked = false
+                        view.setOnClickListener(null)
+                        // The user reacted in time, so we add a successful test to the resultlist
+                        addResult(true)
+                        cancel()
+                    }
                 }
             }
 
             override fun onFinish() {
-                Log.i(TAG, "Not fast enough!")
-                view.setBackgroundColor(colorRed.toArgb())
-                view.text = "Not fast enough!"
-                view.setOnClickListener(null)
-                // The user did not react in time, so we add an unsuccessful test to the resultlist
-                addResult(false)
+                if (!testDone) {
+                    Log.i(TAG, "Not fast enough!")
+                    view.setBackgroundColor(colorRed.toArgb())
+                    view.text = "Not fast enough!"
+                    view.setOnClickListener(null)
+                    // The user did not react in time, so we add an unsuccessful test to the resultlist
+                    addResult(false)
+                }
             }
         }
 
@@ -227,13 +233,13 @@ class ReactionActivity: AppCompatActivity() {
             }
             override fun onFinish() {
                 Log.i(TAG, "Testing Done!")
+                testDone = true
                 subtestTimer.cancel()
                 view.setBackgroundColor(colorGray.toArgb())
                 view.text = ""
                 Log.i(TAG, "$resultList")
                 startButton.isEnabled = true
                 startButton.text = "Retry?"
-
                 showResult()
             }
         }
