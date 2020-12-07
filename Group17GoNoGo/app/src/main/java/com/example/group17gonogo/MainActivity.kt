@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mAudioManager: AudioManager
     private lateinit var mDialog: AlertDialog
-    var isRedTheme: Boolean = false
+    private var isRedTheme: Boolean = false
 
     private var mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -60,13 +60,12 @@ class MainActivity : AppCompatActivity() {
             mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
 
             Log.i(TAG, theme.resources.toString())
-            if (!isRedTheme){
+            isRedTheme = if (!isRedTheme){
                 setTheme(R.style.Theme_Red)
-                isRedTheme = true
-            }
-            else {
+                true
+            } else {
                 setTheme(R.style.Theme_Group17GoNoGo)
-                isRedTheme = false
+                false
             }
             setContentView(R.layout.activity_main)
         }
@@ -118,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     //shows the current leaderboard of all users for test choosen by the user
     fun showLeaderboardOptions(view: View) {
         // not yet completed
-        var dialog = AlertDialog.Builder(this).create()
+        val dialog = AlertDialog.Builder(this).create()
 
         dialog.setTitle("Choose Leaderboard")
         dialog.setMessage("Choose the leaderboard you want to view.")

@@ -43,14 +43,16 @@
         android:layout_height="wrap_content"
         android:background="@color/grayTint"
         android:textSize="16dp"
-        android:text="@string/password_requirements"/>
+        android:text="@string/password_requirements"
+        tools:ignore="SpUsage" />
 
     <TextView
         android:id="@+id/register_to_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12dp"
-        android:text="Text placeholder"/>
+        android:text="Text placeholder"
+        tools:ignore="SpUsage" />
 
     <Button
         android:id="@+id/register"

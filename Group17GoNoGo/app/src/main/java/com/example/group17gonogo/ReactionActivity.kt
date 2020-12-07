@@ -1,5 +1,6 @@
 package com.example.group17gonogo
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -171,6 +172,7 @@ class ReactionActivity: AppCompatActivity() {
         // If the user is not fast enough, the onFinish() will be called: it is here that
         // the view color is changed to "no" automatically as the subtest concluded without any input
         val subtestTimer = object: CountDownTimer(maxWaitTime.toLong(), 1000) {
+            @SuppressLint("SetTextI18n")
             override fun onTick(millisUntilFinished: Long) {
                 //Log.i(TAG, "Now in subtestTimer")
                 if (!testDone) {

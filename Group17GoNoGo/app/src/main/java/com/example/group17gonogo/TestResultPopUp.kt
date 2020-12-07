@@ -56,7 +56,7 @@ class TestResultPopUp : Activity() {
         showResult(intent.getSerializableExtra("result") as ArrayList<GNGResult>)
 
 
-        showLeaderboardButton.setOnClickListener() {
+        showLeaderboardButton.setOnClickListener {
             val intent = Intent(applicationContext, LeaderboardActivity::class.java)
             intent.putExtra("testType", testType)
             startActivity(intent)
@@ -67,36 +67,41 @@ class TestResultPopUp : Activity() {
         Log.i(TAG, "showResult() called with list size of ${list.size}")
 
         var resultText = ""
-        totalScore = 0              // reset the score everytime a new result need to be displayed
+        // reset the score every time a new result need to be displayed
+        totalScore = 0
 
         // loop through the list, create resultString based on the value on each result, append it to create one long string
-        if (testType == TestType.GNG) {
-            for (result in list) {
-                val singleResult = "${result.getGNGMode()} - ${result.getReactTime()} ms - ${result.getTestStatus()}\n"
-                resultText += singleResult
+        when (testType) {
+            TestType.GNG -> {
+                for (result in list) {
+                    val singleResult = "${result.getGNGMode()} - ${result.getReactTime()} ms - ${result.getTestStatus()}\n"
+                    resultText += singleResult
 
-                // the smaller the score, the better the user perform on the test
-                if (result.getGNGMode() == GNGMode.GO && result.getTestStatus() == TestStatus.SUCCESS) {
-                    totalScore += result.getReactTime()
-                } else if (result.getGNGMode() == GNGMode.NO_GO && result.getTestStatus() == TestStatus.SUCCESS) {
-                    totalScore += 500
-                } else {
-                    totalScore += 2000
+                    // the smaller the score, the better the user perform on the test
+                    if (result.getGNGMode() == GNGMode.GO && result.getTestStatus() == TestStatus.SUCCESS) {
+                        totalScore += result.getReactTime()
+                    } else if (result.getGNGMode() == GNGMode.NO_GO && result.getTestStatus() == TestStatus.SUCCESS) {
+                        totalScore += 500
+                    } else {
+                        totalScore += 2000
+                    }
                 }
             }
-        } else if (testType == TestType.React) {                                    // calculate the score for reaction test
-            for (result in list) {
-                val singleResult = "${result.getReactTime()} ms - ${result.getTestStatus()}\n"
-                resultText += singleResult
+            // calculate the score for reaction test
+            TestType.React -> {
+                for (result in list) {
+                    val singleResult = "${result.getReactTime()} ms - ${result.getTestStatus()}\n"
+                    resultText += singleResult
 
-                if (result.getTestStatus() == TestStatus.SUCCESS) {
-                    totalScore += result.getReactTime()                             // add points every time user succeed
-                } else {
-                    totalScore -= result.getReactTime()                             // subtract points everyt ime user failed
+                    if (result.getTestStatus() == TestStatus.SUCCESS) {
+                        // add points every time user succeed
+                        totalScore += result.getReactTime()
+                    } else {
+                        // subtract points for every time user failed
+                        totalScore -= result.getReactTime()
+                    }
                 }
             }
-        } else {
-            Log.i(TAG, "This shouldn't happen! Something is wrong.")
         }
 
 
@@ -135,7 +140,7 @@ class TestResultPopUp : Activity() {
 
         ss.setSpan(clickable, 6, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        noticeTextView.setText(ss)
+        noticeTextView.text = ss
         noticeTextView.movementMethod = LinkMovementMethod.getInstance()
     }
 
@@ -173,7 +178,8 @@ class TestResultPopUp : Activity() {
     override fun onResume() {
         super.onResume()
         if (mAuth!!.currentUser != null) {
-            addScore(totalScore)                // add the score to the database of the newly logged in user
+            // add the score to the database of the newly logged in user
+            addScore(totalScore)
             noticeTextView.visibility = View.GONE
             showLeaderboardButton.visibility = View.VISIBLE
         } else {

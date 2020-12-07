@@ -154,7 +154,7 @@ class GoNoGoActivity: AppCompatActivity() {
 
             ss.setSpan(clickable, 6, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-            recentScoreView.setText(ss)
+            recentScoreView.text = ss
             recentScoreView.movementMethod = LinkMovementMethod.getInstance()
         }
 
@@ -391,8 +391,7 @@ class GoNoGoActivity: AppCompatActivity() {
         //Determines if the device is in dark or light mode.
         // Origin code source:
         // https://stackoverflow.com/questions/44170028/android-how-to-detect-if-night-mode-is-on-when-using-appcompatdelegate-mode-ni
-        val mode = applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
-        when (mode) {
+        when (applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
                 colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_green))
                 colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_red))

@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:text="@string/test_result_text"
         android:textAlignment="center"
-        android:textSize="20dp"/>
+        android:textSize="20dp"
+        tools:ignore="SpUsage" />
 
     <TextView
         android:id="@+id/result_text_view"
@@ -24,7 +25,8 @@
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
         android:textAlignment="center"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical"
+        tools:ignore="SpUsage" />
 
     <TextView
         android:id="@+id/notice_text"
@@ -32,7 +34,8 @@
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
         android:textAlignment="center"
-        android:textSize="20dp"/>
+        android:textSize="20dp"
+        tools:ignore="SpUsage" />
 
     <Button
         android:id="@+id/leaderboard_button"

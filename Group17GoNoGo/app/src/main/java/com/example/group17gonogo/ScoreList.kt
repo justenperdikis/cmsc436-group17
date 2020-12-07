@@ -13,8 +13,8 @@ class ScoreList(private val context:Activity, private var scores: List<Score>) :
 
     // ToDo: add comment here
 
-    lateinit var username: TextView
-    lateinit var scoreValue: TextView
+    private lateinit var username: TextView
+    private lateinit var scoreValue: TextView
 
     @SuppressLint("InflateParams", "ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -33,6 +33,6 @@ class ScoreList(private val context:Activity, private var scores: List<Score>) :
     }
 
     companion object {
-        val TAG = "GoNoGo"
+        const val TAG = "GoNoGo"
     }
 }

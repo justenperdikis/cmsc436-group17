@@ -13,7 +13,8 @@
         android:text="Highscores"
         android:textAlignment="center"
         android:textSize="40dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+        tools:ignore="SpUsage" />
 
     <ListView
         android:id="@+id/score_list_view"

@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
 
         ss.setSpan(clickable, 29, 33, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        loginToRegister.setText(ss)
+        loginToRegister.text = ss
         loginToRegister.movementMethod = LinkMovementMethod.getInstance()
 
         // hide the action bar
