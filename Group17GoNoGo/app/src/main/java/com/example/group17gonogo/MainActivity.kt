@@ -2,11 +2,9 @@ package com.example.group17gonogo
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
-import android.content.res.Configuration
-import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -16,6 +14,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
@@ -99,8 +98,8 @@ class MainActivity : AppCompatActivity() {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
 
         val mGoNoGoIntent = Intent(
-            this@MainActivity,
-            GoNoGoActivity::class.java)
+                this@MainActivity,
+                GoNoGoActivity::class.java)
 
         startActivity(mGoNoGoIntent)
     }
@@ -111,27 +110,38 @@ class MainActivity : AppCompatActivity() {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
         //Show content of instructions
         val mReactionTestIntent = Intent(
-            this@MainActivity,
-            ReactionActivity::class.java)
+                this@MainActivity,
+                ReactionActivity::class.java)
 
         startActivity(mReactionTestIntent)
     }
 
-    //shows the current leaderboard of all users
-    fun showLeaderboard(view: View) {
-        var intent = Intent(applicationContext, LeaderboardActivity::class.java)
-        startActivity(intent)
-    }
-
-    fun leaderboardOptions() {
+    //shows the current leaderboard of all users for test choosen by the user
+    fun showLeaderboardOptions(view: View) {
         // not yet completed
         var dialog = AlertDialog.Builder(this).create()
 
         dialog.setTitle("Choose Leaderboard")
+        dialog.setMessage("Choose the leaderboard you want to view.")
+
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Go No-Go Test") {
+            dialog, which ->
+            var intent = Intent(applicationContext, LeaderboardActivity::class.java)
+            intent.putExtra("testType", TestType.GNG)
+            startActivity(intent)
+        }
+
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Reaction Test") {
+            dialog, which ->
+            var intent = Intent(applicationContext, LeaderboardActivity::class.java)
+            intent.putExtra("testType", TestType.React)
+            startActivity(intent)
+        }
 
         dialog.setCancelable(true)
         dialog.create()
         dialog.show()
+
     }
 
     //Logs out the current user and displays toast
