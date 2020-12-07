@@ -76,8 +76,10 @@ class GoNoGoActivity: AppCompatActivity() {
 
         startButton.setOnClickListener {
 
-            startPlayback()
+            //TODO: Count down from 3
+
             Log.i(TAG, "Play start sound")
+            //startPlayback()
 
             //startReactionTest(reactionTestView)
             //resultList.clear()                          // clear the result list so the previous test result will not get brought over to the next test
@@ -100,32 +102,6 @@ class GoNoGoActivity: AppCompatActivity() {
 
     // ---------- score bug fix test ---------------
 
-    //Sets the colors to light green and red for light mode or unknown mode and dark green and
-    //red for dark mode.
-    private fun setColors(){
-        colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
-        colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
-
-        //Determines if the device is in dark or light mode.
-        // Origin code source:
-        // https://stackoverflow.com/questions/44170028/android-how-to-detect-if-night-mode-is-on-when-using-appcompatdelegate-mode-ni
-        val mode = applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
-        when (mode) {
-            Configuration.UI_MODE_NIGHT_YES -> {
-                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_green))
-                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_red))
-            }
-            Configuration.UI_MODE_NIGHT_NO -> {
-                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
-                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
-            }
-            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
-                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
-                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
-            }
-        }
-    }
-
     override fun onBackPressed() {
         super.onBackPressed()
         if (timer != null) {
@@ -136,7 +112,21 @@ class GoNoGoActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        loadSoundPool()                                             //load sound
         startButton.isEnabled = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        //Unload sound
+        mSoundPool?.apply {
+            unload(mSoundId)
+            release()
+            mSoundPool = null
+        }
+        mAudioManager.unloadSoundEffects()
     }
 
     private fun buttonPressed() {
@@ -413,6 +403,32 @@ class GoNoGoActivity: AppCompatActivity() {
         mSoundPool?.apply {
             // Load bubble popping sound into the SoundPool
             mSoundId = load(this@GoNoGoActivity, R.raw.ding_harsh, 1)
+        }
+    }
+
+    //Sets the colors to light green and red for light mode or unknown mode and dark green and
+    //red for dark mode.
+    private fun setColors(){
+        colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
+        colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
+
+        //Determines if the device is in dark or light mode.
+        // Origin code source:
+        // https://stackoverflow.com/questions/44170028/android-how-to-detect-if-night-mode-is-on-when-using-appcompatdelegate-mode-ni
+        val mode = applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
+        when (mode) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_red))
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
+            }
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
+            }
         }
     }
 
