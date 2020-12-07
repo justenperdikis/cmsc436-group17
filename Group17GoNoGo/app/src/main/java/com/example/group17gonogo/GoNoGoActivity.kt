@@ -9,6 +9,10 @@ import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -17,51 +21,50 @@ import androidx.appcompat.app.AppCompatActivity
 //import com.google.firebase.database.*
 //import com.google.firebase.auth.FirebaseAuth
 import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.*
 
 class GoNoGoActivity: AppCompatActivity() {
 
+    // views
     private lateinit var startButton: Button
     private lateinit var reactionTestView: TextView
     private lateinit var instructionView: TextView
+    private lateinit var highScoreView: TextView
 
+    // color variables
     private lateinit var colorGreen: Color
     private lateinit var colorRed: Color
     private lateinit var colorGray: Color
     private lateinit var colorBlack: Color
 
-    private val maxWaitTime = 2000          // moved up from startReactionTest
-
-    // May not need this var once thread/other solution implemented
-    private var wasClicked = false          // moved up from startReactionTest
-
-    // new variables
+    // var for GoNoGo test
+    private val maxWaitTime = 2000
     private var startTime: Long = 0
-    private var reactTime: Long = 0
-
     private var goProbability = 0.8f
+    private var numOfTest: Int = 20
+    private var currNumOfTest: Int = 0
+    private var transitionLength: Long =300
     private val noGoProbability = 1 - goProbability
-
     private var mode: GNGMode = GNGMode.NONE
     private var testStatus: TestStatus = TestStatus.TBD
-
     private var resultList = ArrayList<GNGResult>()
+    private var hasStarted: Boolean = false
+    private var timer: CountDownTimer? = null
 
+    // variables for sounds
     private var mSoundPool: SoundPool? = null
     private var mSoundId: Int = 0
     private lateinit var mAudioManager: AudioManager
 
-//    private lateinit var databaseScores: DatabaseReference
-
-    // --------------score bug fix test var----------------
-    private var hasStarted: Boolean = false
-    private var numOfTest: Int = 20
-    private var currNumOfTest: Int = 0
-    private var transitionLength: Long =300
-
-    private var timer: CountDownTimer? = null
-
-    // -----------------------------------------
+    // database
+    private var mAuth: FirebaseAuth? = null
+    private val mRootRef = FirebaseDatabase.getInstance().reference
+    private val mGNGScoreRef = mRootRef.child("gngScores")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,8 +75,11 @@ class GoNoGoActivity: AppCompatActivity() {
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
         instructionView = findViewById(R.id.block_two)
+        highScoreView = findViewById(R.id.block_three)
 
+        mAuth = FirebaseAuth.getInstance()
         instructionView.setText(R.string.GoNoGo_instructions)
+        displayScore()                                              // display the player latest score in block3
 
         //set to right depending on light or dark mode
         setColors()
@@ -100,29 +106,54 @@ class GoNoGoActivity: AppCompatActivity() {
             }
             countdownTimer!!.start()
 
-
-            //startReactionTest(reactionTestView)
-            //resultList.clear()                          // clear the result list so the previous test result will not get brought over to the next test
             startButton.isEnabled = false
-
-            // ---------- score bug fix test ---------------
-            //buttonPressed()
-            // ---------------------------------------------
-
         }
 
-        // ---------- score bug fix test ---------------
         reactionTestView.setOnClickListener {
             Log.i(TAG, "reactionTestView clicked")
             buttonPressed()
         }
         // Disable clicking for reactionTestView until the start button is pressed
         reactionTestView.isClickable = false
-        // ---------------------------------------------
-
     }
 
-    // ---------- score bug fix test ---------------
+    private fun displayScore() {
+        if (mAuth!!.currentUser != null) {
+            mGNGScoreRef.addValueEventListener(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    Log.i(ReactionActivity.TAG, "onDataChanged in onStart called")
+
+                    var score: Any? = snapshot.child(mAuth!!.uid.toString()).child("score").getValue()
+
+                    if (score == null) {
+                        highScoreView.text = "Recent Score: 0"
+                    } else {
+                        highScoreView.text = "Recent Score: ${score.toString()}"
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // do nothing
+                }
+            })
+        } else {
+            var text = "Login here to see your recent score!"
+
+            var ss = SpannableString(text)
+            var clickable = object: ClickableSpan() {
+                override fun onClick(view: View) {
+                    var intent = Intent(applicationContext, LoginActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+
+            ss.setSpan(clickable, 6, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            highScoreView.setText(ss)
+            highScoreView.movementMethod = LinkMovementMethod.getInstance()
+        }
+
+    }
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -134,7 +165,7 @@ class GoNoGoActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
+        displayScore()
         loadSoundPool()                                             //load sound
         startButton.isEnabled = true
     }
@@ -165,17 +196,17 @@ class GoNoGoActivity: AppCompatActivity() {
         } else {
             Log.i(TAG, "Ongoing game, change color")
             if (currNumOfTest < numOfTest) {
-                timer!!.cancel()                                     // end current timer
+                timer!!.cancel()                                   // end current timer
                 goProbability -= 0.01f                             // increase the probability of no-go appearing as the test goes
 
                 // get the score value
                 var result = getScore()                 // get the score if the user pressed the screen before the timer ends
                 resultList.add(result)                            // record the current test result
-                //changeColor()                                     // change the color if RNGesus allows
+                //changeColor()                                   // change the color if RNGesus allows
                 testTransition()
 
                 currNumOfTest += 1                                // increase the number of test done
-                timer!!.start()                                     // start new timer for the next test
+                timer!!.start()                                   // start new timer for the next test
             } else {
                 reactionTestView.isClickable = false
                 gameComplete()
@@ -211,6 +242,7 @@ class GoNoGoActivity: AppCompatActivity() {
         timer!!.start()
     }
 
+    // this function handle the short black screen between each test
     private fun testTransition() {
         var transitionTimer: CountDownTimer = object: CountDownTimer(transitionLength, transitionLength) {
             override fun onTick(p0: Long) {
@@ -223,7 +255,7 @@ class GoNoGoActivity: AppCompatActivity() {
 
             override fun onFinish() {
                 // call changeColor
-                changeColor()
+                changeColor()                                                   // black screen is over, change the color to the next one
                 reactionTestView.isClickable = true
             }
 
@@ -231,10 +263,11 @@ class GoNoGoActivity: AppCompatActivity() {
         transitionTimer.start()
     }
 
-    // simmilar to getStatus
+    // this function checks if the user success or failed the test
     private fun getScore() : GNGResult {
         var time = getElapsedTime(startTime, System.currentTimeMillis())
-        Log.i(TAG, "starttime: ${startTime}, time: $time , current time: ${System.currentTimeMillis()}")
+        //Log.i(TAG, "starttime: ${startTime}, time: $time , current time: ${System.currentTimeMillis()}")
+
         if (mode == GNGMode.GO) {
             if (time < maxWaitTime) {
                 testStatus = TestStatus.SUCCESS
@@ -267,7 +300,6 @@ class GoNoGoActivity: AppCompatActivity() {
         resultList.clear()
     }
 
-    // -----------------------------------------------------
 
     private fun changeColor() {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
@@ -288,102 +320,6 @@ class GoNoGoActivity: AppCompatActivity() {
         }
     }
 
-    private fun getStatus() {
-        if (!wasClicked) {
-            reactTime = getElapsedTime(startTime, System.currentTimeMillis())
-
-            if (reactTime < maxWaitTime) {                      // check if the reaction time is less than the time limit
-
-                if (mode == GNGMode.GO) {                       // if the mode is GO
-                    testStatus = TestStatus.SUCCESS                 // record the result as SUCCESS
-                    reactionTestView.setText("SUCCESS")
-                } else if (mode == GNGMode.NO_GO){              // if the mode is NO GO
-                    testStatus = TestStatus.FAILED                  // record the result as failed
-                    reactionTestView.setText("FAILED")
-                } else {
-                    // do nothing
-                }
-
-            } else {                                            // case when reaction time is >= time limit
-
-                if (mode == GNGMode.GO) {                       // if the mode is GO
-                    testStatus = TestStatus.FAILED                  // record the result as failed
-                } else if (mode == GNGMode.NO_GO){              // if the mode is NO GO
-                    testStatus = TestStatus.SUCCESS                 // record the result as SUCCESS
-                } else {
-                    // do nothing
-                }
-            }
-
-            wasClicked = true                                   // changed to true so the user cannot clicked on the same test more than once
-        }
-    }
-
-
-    private fun startReactionTest(view: View) {
-
-        // Test will be between 8 seconds to 17.5 seconds, as outlined in the project proposal
-        // Remember that nextInt() is inclusive to the lower bound and exclusive to the upper,
-        // So we add 8000 milliseconds to start at 8 seconds and end at 17.5
-        //val testDuration = r.nextInt(10500) + 8000
-        //Log.i(TAG, "Test will be $testDuration milliseconds long")
-
-        val testDuration = 20000                    // trial for fixed duration for 10 tests, 2 seconds long per test
-
-        // The overarching CountDownTimer that is the main functionality of this activity.
-        // The variable timeUntilNextSubtest dictates how many seconds will pass until the next
-        // subtest -- that is, when a number of seconds equal to this variable have passed since
-        // the last subtest, the subtestTimer will be started and timeUntilNextSubtest will be
-        // regenerated randomly in anticipation of the next subtest.
-        // We use the currInterval variable to keep track of the number of seconds elapsed between
-        // each subtest; for instance, if timeUntilNextSubtest is 3, that means 3 seconds must
-        // elapse until subtestTimer can begin.
-        // currInterval starts at 0 and is incremented every 1000 milliseconds in onTick.
-        // When currInterval is equal to timeUntilNextSubtest, the required amount of time
-        // has passed and the next subtest can begin
-
-        val testTimer = object: CountDownTimer(testDuration.toLong(), 2000) {       // interval changed from 1000 to 2000
-            override fun onTick(millisUntilFinished: Long) {
-                if (mode != GNGMode.NONE) {
-                    if (testStatus != TestStatus.TBD) {
-                        recordScore()                       // record score
-                    } else {
-                        getStatus()
-                        recordScore()                       // record score
-                    }
-                }
-                startTime = System.currentTimeMillis()      // get new startTime
-                changeColor()
-
-                // since subtestTimer will finish every countdownInterval, start new subtestTimer
-                // might not need this
-                // subtestTimer.start()
-
-            }
-
-            override fun onFinish() {
-                Log.i(TAG, "Testing Done!")
-                view.setBackgroundColor(colorGray.toArgb())
-                startButton.isEnabled = true
-                startButton.text = "Retry?"
-                getStatus()                                 // check if the user pass or fail the last test
-                recordScore()                               // record the last test result
-                showResult()                                // display the result
-            }
-        }
-        testTimer.start()
-
-    }
-
-    private fun recordScore() {
-        // Log.i(TAG, "Mode: $mode, Test status: $testStatus")
-        var result = GNGResult(reactTime, mode, testStatus)     // Create a GNGResult object with the values obtained from last test
-        resultList.add(result)                                  // add result to the arraylist
-        testStatus = TestStatus.TBD                             // reset the status for the next test
-        wasClicked = false                                      // reset the value for the next test
-        goProbability -= 0.02f                                  // increase the chance of No-Go appear as the test goes on, might need to adjust the number later
-    }
-
     private fun showResult() {
         // make sure to stops any unintended timer before showing the test result
         timer!!.cancel()
@@ -393,17 +329,13 @@ class GoNoGoActivity: AppCompatActivity() {
         // create intent to pass the result list to popup activity
         val intent = Intent(applicationContext, TestResultPopUp::class.java)
         intent.putExtra("result", resultList)
+        intent.putExtra("testType", TestType.GNG)
         startActivity(intent)
     }
 
     // Simple function to reduce clutter in important computations -- probably do not need this anymore
     private fun getElapsedTime(start: Long, end: Long): Long {
         return (end - start)
-    }
-
-    // Another simple function to reduce clutter
-    private fun generateDuration(r: Random, bound: Int, offset: Int): Int {
-        return r.nextInt(bound) + offset
     }
 
     private fun startPlayback() {

@@ -12,6 +12,8 @@ import org.w3c.dom.Text
 class ScoreList(private val context:Activity, private var scores: List<Score>) :
     ArrayAdapter<Score>(context, R.layout.score_list_layout, scores) {
 
+    // ToDo: add comment here
+
     lateinit var username: TextView
     lateinit var scoreValue: TextView
 

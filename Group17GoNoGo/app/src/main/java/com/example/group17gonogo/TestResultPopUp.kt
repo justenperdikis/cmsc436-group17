@@ -12,13 +12,9 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
-import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import org.w3c.dom.Text
-import java.lang.Exception
 import java.util.ArrayList
 
 class TestResultPopUp : Activity() {
@@ -29,14 +25,19 @@ class TestResultPopUp : Activity() {
     private var mAuth: FirebaseAuth? = null
     private var totalScore: Long = 0
 
+    private lateinit var testType:TestType
+
     private val mRootRef = FirebaseDatabase.getInstance().reference
-    private val mScoreRef = mRootRef.child("gngScores")
+    private val mGNGScoreRef = mRootRef.child("gngScores")
+    private val mReactionScoreRef = mRootRef.child("reactionScores")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.test_result_pop_up)
 
         Log.i(TAG, "Entered pop up onCreate")
+
+        testType = intent.getSerializableExtra("testType") as TestType
 
         noticeTextView = findViewById(R.id.notice_text)
         showLeaderboardButton = findViewById(R.id.leaderboard_button)
@@ -57,6 +58,7 @@ class TestResultPopUp : Activity() {
 
         showLeaderboardButton.setOnClickListener() {
             var intent = Intent(applicationContext, LeaderboardActivity::class.java)
+            intent.putExtra("testType", testType)
             startActivity(intent)
         }
     }
@@ -68,18 +70,35 @@ class TestResultPopUp : Activity() {
         totalScore = 0              // reset the score everytime a new result need to be displayed
 
         // loop through the list, create resultString based on the value on each result, append it to create one long string
-        for (result in list) {
-            var singleResult = "${result.getGNGMode()} - ${result.getReactTime()} ms - ${result.getTestStatus()}\n"
-            resultText += singleResult
+        if (testType == TestType.GNG) {
+            for (result in list) {
+                var singleResult = "${result.getGNGMode()} - ${result.getReactTime()} ms - ${result.getTestStatus()}\n"
+                resultText += singleResult
 
-            if (result.getGNGMode() == GNGMode.GO && result.getTestStatus() == TestStatus.SUCCESS) {
-                totalScore += (2000 - result.getReactTime())
-            } else if (result.getGNGMode() == GNGMode.NO_GO && result.getTestStatus() == TestStatus.SUCCESS) {
-                totalScore += 1000
-            } else {
-                totalScore -= 500
+                // the smaller the score, the better the user perform on the test
+                if (result.getGNGMode() == GNGMode.GO && result.getTestStatus() == TestStatus.SUCCESS) {
+                    totalScore += result.getReactTime()
+                } else if (result.getGNGMode() == GNGMode.NO_GO && result.getTestStatus() == TestStatus.SUCCESS) {
+                    totalScore += 500
+                } else {
+                    totalScore += 2000
+                }
             }
+        } else if (testType == TestType.React) {                                    // calculate the score for reaction test
+            for (result in list) {
+                var singleResult = "${result.getReactTime()} ms - ${result.getTestStatus()}\n"
+                resultText += singleResult
+
+                if (result.getTestStatus() == TestStatus.SUCCESS) {
+                    totalScore += result.getReactTime()                             // add points every time user succeed
+                } else {
+                    totalScore -= result.getReactTime()                             // subtract points everyt ime user failed
+                }
+            }
+        } else {
+            Log.i(TAG, "This shouldn't happen! Something is wrong.")
         }
+
 
         resultText += "\nYour test score is: $totalScore\n"
 
@@ -133,7 +152,14 @@ class TestResultPopUp : Activity() {
 
                 // record the data inside onDataChange because it took time to access database and query the username
                 val score = Score(username, score.toInt())
-                mScoreRef.child(uid).setValue(score)
+
+                if (testType == TestType.GNG) {
+                    mGNGScoreRef.child(uid).setValue(score)
+                } else if (testType == TestType.React) {
+                    mReactionScoreRef.child(uid).setValue(score)
+                } else {
+                    // not suppose to enter here
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {

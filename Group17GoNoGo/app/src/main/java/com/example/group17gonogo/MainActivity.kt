@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         loginLogoutButton = findViewById(R.id.main_login_or_logout_button)
         exitButton = findViewById(R.id.exit_button)
 
+        supportActionBar!!.setTitle("")
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -120,6 +121,17 @@ class MainActivity : AppCompatActivity() {
     fun showLeaderboard(view: View) {
         var intent = Intent(applicationContext, LeaderboardActivity::class.java)
         startActivity(intent)
+    }
+
+    fun leaderboardOptions() {
+        // not yet completed
+        var dialog = AlertDialog.Builder(this).create()
+
+        dialog.setTitle("Choose Leaderboard")
+
+        dialog.setCancelable(true)
+        dialog.create()
+        dialog.show()
     }
 
     //Logs out the current user and displays toast

@@ -19,7 +19,16 @@ class LeaderboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_leaderboard)
 
-        scoreDatabase = FirebaseDatabase.getInstance().getReference("gngScores").orderByChild("score").limitToLast(50)
+        val testType = intent.getSerializableExtra("testType")
+
+        if (testType == TestType.GNG) {
+            scoreDatabase = FirebaseDatabase.getInstance().getReference("gngScores").orderByChild("score").limitToLast(50)
+        } else if (testType == TestType.React) {
+            scoreDatabase = FirebaseDatabase.getInstance().getReference("reactionScores").orderByChild("score").limitToLast(50)
+        } else {
+            Log.i(TestResultPopUp.TAG, "This shouldn't happen! Something is wrong.")
+        }
+
         scoreListView = findViewById(R.id.score_list_view)
 
         scoreListView.isClickable = false

@@ -1,41 +1,60 @@
 package com.example.group17gonogo
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.media.AudioManager
 import android.media.SoundPool
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import java.lang.Exception
 import java.util.*
 
 class ReactionActivity: AppCompatActivity() {
 
+    // views
     private lateinit var startButton: Button
     private lateinit var reactionTestView: TextView
     private lateinit var instructionView: TextView
+    private lateinit var highScoreView: TextView
 
+    // colors
     private lateinit var colorGreen: Color
     private lateinit var colorRed: Color
     private lateinit var colorGray: Color
     private lateinit var colorBlack: Color
 
+    // test var
     var wasClicked = false
-
     private var startTime: Long = 0
     private var reactTime: Long = 0
-
     private var resultList = ArrayList<GNGResult>()
 
+    // sounds var
     private var mSoundPool: SoundPool? = null
     private var mSoundId: Int = 0
     private lateinit var mAudioManager: AudioManager
+
+    // database
+    private var mAuth: FirebaseAuth? = null
+    private val mRootRef = FirebaseDatabase.getInstance().reference
+    private val mReactionScoreRef = mRootRef.child("reactionScores")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +66,12 @@ class ReactionActivity: AppCompatActivity() {
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
         instructionView = findViewById(R.id.block_two)
+        highScoreView = findViewById(R.id.block_three)
+
+        mAuth = FirebaseAuth.getInstance()
 
         instructionView.setText(R.string.ReactionTest_instructions)
+        displayScore()                                              // display the player latest score in block3
 
         //Set colors depending on light or dark mode
         setColors()
@@ -59,6 +82,43 @@ class ReactionActivity: AppCompatActivity() {
         }
 
         supportActionBar!!.setTitle("Reaction Test")                // change the label in the action bar
+    }
+
+    private fun displayScore() {
+        if (mAuth!!.currentUser != null) {
+            mReactionScoreRef.addValueEventListener(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    Log.i(ReactionActivity.TAG, "onDataChanged in onStart called")
+
+                    var score: Any? = snapshot.child(mAuth!!.uid.toString()).child("score").getValue()
+
+                    if (score == null) {
+                        highScoreView.text = "Recent Score: 0"
+                    } else {
+                        highScoreView.text = "Recent Score: ${score.toString()}"
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // do nothing
+                }
+            })
+        } else {
+            var text = "Login here to see your recent score!"
+
+            var ss = SpannableString(text)
+            var clickable = object: ClickableSpan() {
+                override fun onClick(view: View) {
+                    var intent = Intent(applicationContext, LoginActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+
+            ss.setSpan(clickable, 6, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            highScoreView.setText(ss)
+            highScoreView.movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     private fun startReactionTest(view: TextView) {
@@ -176,14 +236,33 @@ class ReactionActivity: AppCompatActivity() {
                 // TODO -- If we expand our firebase realtime database to hold reaction test scores,
                 //  will need to send an intent to the TestResultPopUp activity with the resultList
                 //  as an extra, like in GoNoGoActivity's showResult() method
-                resultList.clear()
+
                 startButton.isEnabled = true
                 startButton.text = "Retry?"
+
+                showResult()
             }
         }
         testTimer.start()
 
     }
+
+    // -------------- new addition -----------------------------
+
+    private fun showResult() {
+        // make sure to stops any unintended timer before showing the test result
+        reactionTestView.setBackgroundColor(colorGray.toArgb())
+        reactionTestView.text = ""
+
+        // create intent to pass the result list to popup activity
+        val intent = Intent(applicationContext, TestResultPopUp::class.java)
+        intent.putExtra("result", resultList)
+        intent.putExtra("testType", TestType.React)
+        startActivity(intent)
+        resultList.clear()
+    }
+
+    // ----------------------------------------------------------
 
     // Simple function to reduce clutter in important computations -- probably do not need this anymore
     private fun getElapsedTime(start: Long, end: Long): Long {
@@ -238,4 +317,8 @@ class ReactionActivity: AppCompatActivity() {
     companion object {
         const val TAG = "GoNoGo"
     }
+}
+
+enum class TestType {
+    NONE, React, GNG
 }
