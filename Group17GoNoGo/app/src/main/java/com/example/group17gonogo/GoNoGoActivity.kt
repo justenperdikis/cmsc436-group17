@@ -2,6 +2,7 @@ package com.example.group17gonogo
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -70,14 +71,11 @@ class GoNoGoActivity: AppCompatActivity() {
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
 
-        // May add accessibility option for colorblind users -- if so, will need to change var names
-        // because these colors will not be green and red
-        colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
-        colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
-        colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
-        colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
+        //set to right depending on light or dark mode
+        setColors()
 
         startButton.setOnClickListener {
+
             startPlayback()
             Log.i(TAG, "Play start sound")
 
@@ -101,6 +99,32 @@ class GoNoGoActivity: AppCompatActivity() {
     }
 
     // ---------- score bug fix test ---------------
+
+    //Sets the colors to light green and red for light mode or unknown mode and dark green and
+    //red for dark mode.
+    private fun setColors(){
+        colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
+        colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
+
+        //Determines if the device is in dark or light mode.
+        // Origin code source:
+        // https://stackoverflow.com/questions/44170028/android-how-to-detect-if-night-mode-is-on-when-using-appcompatdelegate-mode-ni
+        val mode = applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
+        when (mode) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_red))
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
+            }
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
+            }
+        }
+    }
 
     override fun onBackPressed() {
         super.onBackPressed()

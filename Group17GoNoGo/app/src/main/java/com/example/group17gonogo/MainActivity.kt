@@ -3,6 +3,8 @@ package com.example.group17gonogo
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.drawable.BitmapDrawable
 import android.media.AudioManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,11 +14,13 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var logo: ImageView
     private lateinit var startButton: Button
     private lateinit var instructionButton: Button
     private lateinit var leaderboardButton: Button
@@ -25,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mAudioManager: AudioManager
     private lateinit var mDialog: AlertDialog
-    var isDarkTheme: Boolean = false
+    var isRedTheme: Boolean = false
 
     private var mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -33,13 +37,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //get audio manager
         mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+        logo = findViewById(R.id.logoView)
         startButton = findViewById(R.id.goNoGoStart_button)
         instructionButton = findViewById(R.id.reactionTest_button)
         leaderboardButton = findViewById(R.id.main_leaderboard_button)
         loginLogoutButton = findViewById(R.id.main_login_or_logout_button)
         exitButton = findViewById(R.id.exit_button)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -49,21 +56,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //Changes themes to red or green
         if (item.itemId == R.id.change_theme) {
             mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
 
             Log.i(TAG, theme.resources.toString())
-            if (!isDarkTheme){
+            if (!isRedTheme){
                 setTheme(R.style.Theme_Red)
-                isDarkTheme = true
+                isRedTheme = true
             }
             else {
                 setTheme(R.style.Theme_Group17GoNoGo)
-                isDarkTheme = false
+                isRedTheme = false
             }
             setContentView(R.layout.activity_main)
         }
 
+        //Display alert dialog of extra information
         if (item.itemId == R.id.more_info){
             mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
 
@@ -83,6 +92,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    //Start the Go-No-Go test
     fun startGoNoGo(view: View) {
 //        Log.i(TAG, "Entered startTest()")
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
@@ -94,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(mGoNoGoIntent)
     }
 
+    //start the simple reaction test
     fun startReactionTest(view: View) {
 //        Log.i(TAG, "Entered startReactionTest()")
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
@@ -105,11 +116,13 @@ class MainActivity : AppCompatActivity() {
         startActivity(mReactionTestIntent)
     }
 
+    //shows the current leaderboard of all users
     fun showLeaderboard(view: View) {
         var intent = Intent(applicationContext, LeaderboardActivity::class.java)
         startActivity(intent)
     }
 
+    //Logs out the current user and displays toast
     fun loginLogout(view: View) {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
         if (mAuth.currentUser != null) {        // logout
@@ -123,6 +136,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //Exits the app
     fun exitApp(view: View) {
         super.onBackPressed()
 //        Log.i(TAG, "Exiting app")

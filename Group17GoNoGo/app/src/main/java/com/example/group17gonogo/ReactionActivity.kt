@@ -1,6 +1,7 @@
 package com.example.group17gonogo
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.media.AudioManager
 import android.media.SoundPool
@@ -45,12 +46,8 @@ class ReactionActivity: AppCompatActivity() {
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
 
-        // May add accessibility option for colorblind users -- if so, will need to change var names
-        // because these colors will not be green and red
-        colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
-        colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
-        colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
-        colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
+        //Set colors depending on light or dark mode
+        setColors()
 
         startButton.setOnClickListener {
             startReactionTest(reactionTestView)
@@ -210,6 +207,27 @@ class ReactionActivity: AppCompatActivity() {
             GNGResult(time, GNGMode.GO, TestStatus.FAILED)
         }
         resultList.add(result)
+    }
+
+    private fun setColors(){
+        colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
+        colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
+
+        val mode = applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
+        when (mode) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_red))
+            }
+            Configuration.UI_MODE_NIGHT_NO -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
+            }
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+                colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.green))
+                colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.red))
+            }
+        }
     }
 
     companion object {
