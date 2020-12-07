@@ -370,10 +370,6 @@ class GoNoGoActivity: AppCompatActivity() {
         return r.nextInt(bound) + offset
     }
 
-    companion object {
-        const val TAG = "GoNoGo"
-    }
-
     private fun startPlayback() {
         mSoundPool?.play(
                 mSoundId, 10f, 10f, 1, 0, 1.0f
@@ -394,6 +390,10 @@ class GoNoGoActivity: AppCompatActivity() {
             // Load bubble popping sound into the SoundPool
             mSoundId = load(this@GoNoGoActivity, R.raw.ding_harsh, 1)
         }
+    }
+
+    companion object {
+        const val TAG = "GoNoGo"
     }
 }
 

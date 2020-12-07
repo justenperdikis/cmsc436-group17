@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Group17GoNoGo">
-        <activity android:name=".SplashScreen">
+        <activity android:name=".SplashScreen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,29 +18,37 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LeaderboardActivity" />
+        <activity android:name=".LeaderboardActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".TestResultPopUp"
             android:label="@string/title_activity_test_result_pop_up"
-            android:theme="@style/result_popup" />
+            android:theme="@style/result_popup"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".RegistrationActivity" />
+        <activity android:name=".RegistrationActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".MainActivity"
-            android:label="MainActivity">
+            android:label="MainActivity"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity
             android:name=".GoNoGoActivity"
-            android:label="Go No-Go Test" />
+            android:label="Go No-Go Test"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".ReactionActivity" />
+        <activity android:name=".ReactionActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".InstructionsActivity" />
+        <activity android:name=".InstructionsActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -61,6 +61,8 @@ class RegistrationActivity : AppCompatActivity(){
 
         registerToLogin.setText(ss)
         registerToLogin.movementMethod = LinkMovementMethod.getInstance()
+
+        supportActionBar!!.hide()                   // hide the action bar
     }
 
 

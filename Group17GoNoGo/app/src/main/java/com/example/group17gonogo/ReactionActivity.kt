@@ -57,6 +57,7 @@ class ReactionActivity: AppCompatActivity() {
             startButton.isEnabled = false
         }
 
+        supportActionBar!!.setTitle("Reaction Test")                // change the label in the action bar
     }
 
     private fun startReactionTest(view: TextView) {

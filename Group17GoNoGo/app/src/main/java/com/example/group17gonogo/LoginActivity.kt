@@ -56,6 +56,8 @@ class LoginActivity : AppCompatActivity() {
 
         loginToRegister.setText(ss)
         loginToRegister.movementMethod = LinkMovementMethod.getInstance()
+
+        supportActionBar!!.hide()                   // hide the action bar
     }
 
     private fun loginUserAccount() {

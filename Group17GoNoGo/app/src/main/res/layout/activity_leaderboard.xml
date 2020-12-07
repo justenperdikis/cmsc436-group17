@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:text="Highscores"
         android:textAlignment="center"
+        android:textSize="40dp"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
 
     <ListView
@@ -19,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView"
-        android:layout_marginTop="15dp" />
+        android:layout_marginTop="15dp"
+        android:listSelector="@android:color/transparent"/>
 
 </RelativeLayout>

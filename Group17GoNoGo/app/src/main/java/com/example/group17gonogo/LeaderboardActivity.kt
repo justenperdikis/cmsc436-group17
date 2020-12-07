@@ -26,6 +26,8 @@ class LeaderboardActivity : AppCompatActivity() {
 
         scores = ArrayList()
 
+        supportActionBar!!.hide()                   // hide the action bar
+
     }
 
     override fun onStart() {
