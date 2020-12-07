@@ -19,7 +19,7 @@ class LeaderboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_leaderboard)
 
-        scoreDatabase = FirebaseDatabase.getInstance().getReference("scores").orderByChild("score").limitToLast(50)
+        scoreDatabase = FirebaseDatabase.getInstance().getReference("gngScores").orderByChild("score").limitToLast(50)
         scoreListView = findViewById(R.id.score_list_view)
 
         scoreListView.isClickable = false

@@ -30,7 +30,7 @@ class TestResultPopUp : Activity() {
     private var totalScore: Long = 0
 
     private val mRootRef = FirebaseDatabase.getInstance().reference
-    private val mScoreRef = mRootRef.child("scores")
+    private val mScoreRef = mRootRef.child("gngScores")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
