@@ -3,7 +3,7 @@
     <style name="Theme.Group17GoNoGo" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="title">"Go No-Go"</item>
-        <item name="android:actionBarItemBackground">@color/red</item>
+        <item name="android:actionBarItemBackground">@color/green</item>
         <item name="android:headerBackground">@color/red</item>
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryVariant">@color/gray</item>
@@ -17,7 +17,7 @@
 
     <style name="Theme_Red" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="android:actionBarItemBackground">@color/red</item>
+        <item name="android:actionBarItemBackground">@color/green</item>
         <item name="title">"...No-Go"</item>
         <item name="colorPrimary">@color/red</item>
         <item name="colorPrimaryVariant">@color/red</item>
