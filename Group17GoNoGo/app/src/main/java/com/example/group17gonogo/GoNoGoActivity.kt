@@ -70,23 +70,40 @@ class GoNoGoActivity: AppCompatActivity() {
 
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
+        reactionTestView.setText("")
 
         //set to right depending on light or dark mode
         setColors()
 
         startButton.setOnClickListener {
 
-            //TODO: Count down from 3
-
+            //Plays ding
             Log.i(TAG, "Play start sound")
-            //startPlayback()
+            startPlayback()
+
+            //counts down from 3
+            var count = 3
+            var countdownTimer = object: CountDownTimer(3000, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    reactionTestView.setText(count.toString())
+                    Log.i(TAG, "Count" + count.toString())
+                    count--
+                }
+
+                override fun onFinish() {                                                           // executed when timer is finished
+                    //starts test
+                    buttonPressed()
+                }
+            }
+            countdownTimer!!.start()
+
 
             //startReactionTest(reactionTestView)
             //resultList.clear()                          // clear the result list so the previous test result will not get brought over to the next test
             startButton.isEnabled = false
 
             // ---------- score bug fix test ---------------
-            buttonPressed()
+            //buttonPressed()
             // ---------------------------------------------
 
         }
