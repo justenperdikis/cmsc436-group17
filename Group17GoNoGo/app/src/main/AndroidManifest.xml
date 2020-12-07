@@ -46,9 +46,6 @@
 
         <activity android:name=".ReactionActivity"
             android:screenOrientation="portrait"/>
-
-        <activity android:name=".InstructionsActivity"
-            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
