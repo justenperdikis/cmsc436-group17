@@ -23,6 +23,7 @@ class GoNoGoActivity: AppCompatActivity() {
 
     private lateinit var startButton: Button
     private lateinit var reactionTestView: TextView
+    private lateinit var instructionView: TextView
 
     private lateinit var colorGreen: Color
     private lateinit var colorRed: Color
@@ -70,7 +71,9 @@ class GoNoGoActivity: AppCompatActivity() {
 
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
-        reactionTestView.setText("")
+        instructionView = findViewById(R.id.block_two)
+
+        instructionView.setText(R.string.GoNoGo_instructions)
 
         //set to right depending on light or dark mode
         setColors()
@@ -113,6 +116,8 @@ class GoNoGoActivity: AppCompatActivity() {
             Log.i(TAG, "reactionTestView clicked")
             buttonPressed()
         }
+        // Disable clicking for reactionTestView until the start button is pressed
+        reactionTestView.isClickable = false
         // ---------------------------------------------
 
     }
