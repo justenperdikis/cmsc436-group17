@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Go-NoGo</string>
+    <string name="app_name">Go-No-Go</string>
     <string name="title_activity_test_result_pop_up">TestResultPopUp</string>
     <!--
     This string is used for square devices and overridden by hello_world in
