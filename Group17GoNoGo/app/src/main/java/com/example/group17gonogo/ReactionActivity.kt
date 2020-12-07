@@ -24,6 +24,13 @@ class ReactionActivity: AppCompatActivity() {
     private lateinit var colorGray: Color
     private lateinit var colorBlack: Color
 
+    var wasClicked = false
+
+    private var startTime: Long = 0
+    private var reactTime: Long = 0
+
+    private var resultList = ArrayList<GNGResult>()
+
     private var mSoundPool: SoundPool? = null
     private var mSoundId: Int = 0
     private lateinit var mAudioManager: AudioManager
@@ -52,8 +59,9 @@ class ReactionActivity: AppCompatActivity() {
 
     }
 
-    private fun startReactionTest(view: View) {
+    private fun startReactionTest(view: TextView) {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
+        view.text = "Get ready..."
 
         val r = Random()
         val maxWaitTime = 2000
@@ -64,17 +72,15 @@ class ReactionActivity: AppCompatActivity() {
         val testDuration = r.nextInt(10500) + 8000
         Log.i(TAG, "Test will be $testDuration milliseconds long")
 
-        // May not need this var once thread/other solution implemented
-        var wasClicked = false
-
         // We set the color to red as the test begins
-        view.setBackgroundColor(colorRed.toArgb())
+        view.setBackgroundColor(colorGray.toArgb())
         // The view will not have an OnClickListener until we begin our subtests
         view.setOnClickListener(null)
 
         // the OnClickListener for the view -- this is enabled during subtests,
         // and currently only uses a boolean to track whether or not the user clicked the view
         val reactionClick = View.OnClickListener {
+            mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
             wasClicked = true
         }
 
@@ -86,7 +92,6 @@ class ReactionActivity: AppCompatActivity() {
 
         var timeUntilNextSubtest = generateDuration(r, 3, 1)
         val subTestStart = System.currentTimeMillis()
-        var colorChangeStart = Long.MAX_VALUE
 
         Log.i(TAG, "First subTestDuration: $timeUntilNextSubtest")
         var currInterval = 0
@@ -104,11 +109,13 @@ class ReactionActivity: AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {
                 //Log.i(TAG, "Now in subtestTimer")
                 if (wasClicked) {
-                    mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
                     Log.i(TAG, "User reacted in time!")
-                    view.setBackgroundColor(colorRed.toArgb())
+                    view.setBackgroundColor(colorGray.toArgb())
+                    view.text = "Good!"
                     wasClicked = false
                     view.setOnClickListener(null)
+                    // The user reacted in time, so we add a successful test to the resultlist
+                    addResult(true)
                     cancel()
                 }
             }
@@ -116,7 +123,10 @@ class ReactionActivity: AppCompatActivity() {
             override fun onFinish() {
                 Log.i(TAG, "Not fast enough!")
                 view.setBackgroundColor(colorRed.toArgb())
+                view.text = "Not fast enough!"
                 view.setOnClickListener(null)
+                // The user did not react in time, so we add an unsuccessful test to the resultlist
+                addResult(false)
             }
         }
 
@@ -141,10 +151,11 @@ class ReactionActivity: AppCompatActivity() {
                     // Change the view color to "go" color, and wait for user input.
                     // Create a nested timer that will countdown using maxWaitTime.
                     // If the user reacts in time, cancel() the nested timer
-                    // TODO -- record reaction speed for each subtest
                     // If the user is too slow, handle changing view color back to "no" color in onFinish
                     view.setBackgroundColor(colorGreen.toArgb())
+                    view.text = "Click!"
                     view.setOnClickListener(reactionClick)
+                    startTime = System.currentTimeMillis()
                     subtestTimer.start()
 //                    view.setOnClickListener(null)
                     // Regenerate subTestDuration with a function
@@ -156,7 +167,13 @@ class ReactionActivity: AppCompatActivity() {
             }
             override fun onFinish() {
                 Log.i(TAG, "Testing Done!")
+                subtestTimer.cancel()
                 view.setBackgroundColor(colorGray.toArgb())
+                Log.i(TAG, "$resultList")
+                // TODO -- If we expand our firebase realtime database to hold reaction test scores,
+                //  will need to send an intent to the TestResultPopUp activity with the resultList
+                //  as an extra, like in GoNoGoActivity's showResult() method
+                resultList.clear()
                 startButton.isEnabled = true
                 startButton.text = "Retry?"
             }
@@ -173,6 +190,25 @@ class ReactionActivity: AppCompatActivity() {
     // Another simple function to reduce clutter
     private fun generateDuration(r: Random, bound: Int, offset: Int): Int {
         return r.nextInt(bound) + offset
+    }
+
+    // The addResult function creates a GNGResult whose fields are based on whether the user passed
+    // or failed a subtest -- if the user clicked in time, they passed, and the GNGResult is
+    // populated with TestStatus.SUCCESS, else if the user fails to react in time, the GNGResult
+    // is populated with the TestStatus.FAILED
+    // The GNGResult object is used because it is an integral unit of the firebase realtime database
+    // as well, this is a simple reaction test, and we do not need as rich detail for these tests as
+    // is needed for the GoNoGoActivity, so GNGResult is well suited to recording results of these
+    // two types of tests
+    private fun addResult(passed: Boolean) {
+        var time = getElapsedTime(startTime, System.currentTimeMillis())
+        var result : GNGResult
+        result = if (passed) {
+            GNGResult(time, GNGMode.GO, TestStatus.SUCCESS)
+        } else {
+            GNGResult(time, GNGMode.GO, TestStatus.FAILED)
+        }
+        resultList.add(result)
     }
 
     companion object {
