@@ -1,5 +1,6 @@
 package com.example.group17gonogo
-
+// This class validates user emails and passwords for account creation
+// and is based on the Validators.kt class in the Lab7-Firebase project
 class Validators {
     fun validEmail(email: String?) : Boolean {
         if (email.isNullOrEmpty()) {
