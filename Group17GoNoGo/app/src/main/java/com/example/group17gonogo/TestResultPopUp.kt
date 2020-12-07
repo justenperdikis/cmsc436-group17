@@ -120,13 +120,6 @@ class TestResultPopUp : Activity() {
         noticeTextView.movementMethod = LinkMovementMethod.getInstance()
     }
 
-    private fun compareScore() {
-        //var test = mRootRef.orderByChild("scores")
-
-
-        noticeTextView.setText("Need to compare score here")
-    }
-
     private fun addScore(score: Long) {
         val uid = mAuth!!.uid as String
 
@@ -144,7 +137,7 @@ class TestResultPopUp : Activity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-
+                // do nothing
             }
         })
 

@@ -39,11 +39,40 @@
         android:layout_marginTop="10dp"
         android:onClick="startReactionTest"
         android:text="Simple Reaction Test"
-        app:layout_constraintBottom_toTopOf="@id/exit_button"
+        app:layout_constraintBottom_toTopOf="@id/main_leaderboard_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.525"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/goNoGoStart_button"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0" />
+
+    <Button
+        android:id="@+id/main_leaderboard_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:gravity="center"
+        android:onClick="showLeaderboard"
+        android:text="Leaderboard"
+        app:layout_constraintBottom_toTopOf="@+id/main_login_or_logout_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.483"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reactionTest_button"
+        app:layout_constraintVertical_bias="0.7" />
+
+    <Button
+        android:id="@+id/main_login_or_logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:gravity="center"
+        android:onClick="loginLogout"
+        android:text="Login"
+        app:layout_constraintBottom_toTopOf="@+id/exit_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/exit_button"
