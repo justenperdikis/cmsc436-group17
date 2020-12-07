@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.media.AudioManager
-import android.media.SoundPool
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.SpannableString
@@ -23,7 +22,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.lang.Exception
 import java.util.*
 
 class ReactionActivity: AppCompatActivity() {
@@ -32,7 +30,7 @@ class ReactionActivity: AppCompatActivity() {
     private lateinit var startButton: Button
     private lateinit var reactionTestView: TextView
     private lateinit var instructionView: TextView
-    private lateinit var highScoreView: TextView
+    private lateinit var recentScoreView: TextView
 
     // colors
     private lateinit var colorGreen: Color
@@ -43,12 +41,9 @@ class ReactionActivity: AppCompatActivity() {
     // test var
     var wasClicked = false
     private var startTime: Long = 0
-    private var reactTime: Long = 0
     private var resultList = ArrayList<GNGResult>()
 
     // sounds var
-    private var mSoundPool: SoundPool? = null
-    private var mSoundId: Int = 0
     private lateinit var mAudioManager: AudioManager
 
     // database
@@ -60,42 +55,50 @@ class ReactionActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reaction)
 
+        // obtain audio manager
         mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        // If on block three, make it invisible after it is pressed
+        // obtain views
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
         instructionView = findViewById(R.id.block_two)
-        highScoreView = findViewById(R.id.block_three)
+        recentScoreView = findViewById(R.id.block_three)
 
+        // obtain instance of FirebaseAuth
         mAuth = FirebaseAuth.getInstance()
 
+        // set the instructionView text to the proper instruction string
         instructionView.setText(R.string.ReactionTest_instructions)
-        displayScore()                                              // display the player latest score in block3
+
+        // display the player's latest score in highScoreView
+        displayScore()
 
         //Set colors depending on light or dark mode
         setColors()
 
+        // add an onClickListener to startButton that calls startReactionTest
         startButton.setOnClickListener {
             startReactionTest(reactionTestView)
+            // disable the startButton so it is no longer visible
             startButton.isEnabled = false
         }
 
-        supportActionBar!!.setTitle("Reaction Test")                // change the label in the action bar
+        // change the label in the action bar
+        supportActionBar!!.title = "Reaction Test"
     }
 
     private fun displayScore() {
         if (mAuth!!.currentUser != null) {
             mReactionScoreRef.addValueEventListener(object: ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.i(ReactionActivity.TAG, "onDataChanged in onStart called")
+                    Log.i(TAG, "onDataChanged in onStart called")
 
-                    var score: Any? = snapshot.child(mAuth!!.uid.toString()).child("score").getValue()
+                    val score: Any? = snapshot.child(mAuth!!.uid.toString()).child("score").value
 
                     if (score == null) {
-                        highScoreView.text = "Recent Score: 0"
+                        recentScoreView.text = getString(R.string.highscore_text, "0")
                     } else {
-                        highScoreView.text = "Recent Score: ${score.toString()}"
+                        recentScoreView.text = getString(R.string.highscore_text, score.toString())
                     }
                 }
 
@@ -104,20 +107,20 @@ class ReactionActivity: AppCompatActivity() {
                 }
             })
         } else {
-            var text = "Login here to see your recent score!"
+            val text = "Login here to see your recent score!"
 
-            var ss = SpannableString(text)
-            var clickable = object: ClickableSpan() {
+            val ss = SpannableString(text)
+            val clickable = object: ClickableSpan() {
                 override fun onClick(view: View) {
-                    var intent = Intent(applicationContext, LoginActivity::class.java)
+                    val intent = Intent(applicationContext, LoginActivity::class.java)
                     startActivity(intent)
                 }
             }
 
             ss.setSpan(clickable, 6, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-            highScoreView.setText(ss)
-            highScoreView.movementMethod = LinkMovementMethod.getInstance()
+            recentScoreView.text = ss
+            recentScoreView.movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
@@ -153,7 +156,6 @@ class ReactionActivity: AppCompatActivity() {
         // These subtests will be run for testDuration -- this is accomplished with a CountDownTimer
 
         var timeUntilNextSubtest = generateDuration(r, 3, 1)
-        val subTestStart = System.currentTimeMillis()
 
         Log.i(TAG, "First subTestDuration: $timeUntilNextSubtest")
         var currInterval = 0
@@ -166,7 +168,6 @@ class ReactionActivity: AppCompatActivity() {
         // to set wasClicked to false so that future tests can use this variable
         // If the user is not fast enough, the onFinish() will be called: it is here that
         // the view color is changed to "no" automatically as the subtest concluded without any input
-        // TODO -- Issue a toast and determine logic for handling subtests that the user failed to react to
         val subtestTimer = object: CountDownTimer(maxWaitTime.toLong(), 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 //Log.i(TAG, "Now in subtestTimer")
@@ -205,8 +206,6 @@ class ReactionActivity: AppCompatActivity() {
         // has passed and the next subtest can begin
         val testTimer = object: CountDownTimer(testDuration.toLong(), 1000) {
             override fun onTick(millisUntilFinished: Long) {
-//                Log.i(TAG, "Seconds remaining: " + millisUntilFinished/1000)
-//                Log.i(TAG, "Timing for current interval: $currInterval")
                 if (timeUntilNextSubtest.toLong() == (currInterval++).toLong()) {
                     Log.i(TAG, "Changing to \"go\" color")
                     // This is where the subtest actually begins.
@@ -219,7 +218,6 @@ class ReactionActivity: AppCompatActivity() {
                     view.setOnClickListener(reactionClick)
                     startTime = System.currentTimeMillis()
                     subtestTimer.start()
-//                    view.setOnClickListener(null)
                     // Regenerate subTestDuration with a function
                     timeUntilNextSubtest = generateDuration(r, 3, 1)
                     Log.i(TAG, "New subTestDuration: $timeUntilNextSubtest")
@@ -233,10 +231,6 @@ class ReactionActivity: AppCompatActivity() {
                 view.setBackgroundColor(colorGray.toArgb())
                 view.text = ""
                 Log.i(TAG, "$resultList")
-                // TODO -- If we expand our firebase realtime database to hold reaction test scores,
-                //  will need to send an intent to the TestResultPopUp activity with the resultList
-                //  as an extra, like in GoNoGoActivity's showResult() method
-
                 startButton.isEnabled = true
                 startButton.text = "Retry?"
 
@@ -250,7 +244,6 @@ class ReactionActivity: AppCompatActivity() {
     // -------------- new addition -----------------------------
 
     private fun showResult() {
-        // make sure to stops any unintended timer before showing the test result
         reactionTestView.setBackgroundColor(colorGray.toArgb())
         reactionTestView.text = ""
 
@@ -279,12 +272,12 @@ class ReactionActivity: AppCompatActivity() {
     // populated with TestStatus.SUCCESS, else if the user fails to react in time, the GNGResult
     // is populated with the TestStatus.FAILED
     // The GNGResult object is used because it is an integral unit of the firebase realtime database
-    // as well, this is a simple reaction test, and we do not need as rich detail for these tests as
+    // This is a simple reaction test, and we do not need as rich detail for these tests as
     // is needed for the GoNoGoActivity, so GNGResult is well suited to recording results of these
     // two types of tests
     private fun addResult(passed: Boolean) {
-        var time = getElapsedTime(startTime, System.currentTimeMillis())
-        var result : GNGResult
+        val time = getElapsedTime(startTime, System.currentTimeMillis())
+        val result : GNGResult
         result = if (passed) {
             GNGResult(time, GNGMode.GO, TestStatus.SUCCESS)
         } else {
@@ -297,8 +290,7 @@ class ReactionActivity: AppCompatActivity() {
         colorGray = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.gray))
         colorBlack = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.black))
 
-        val mode = applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
-        when (mode) {
+        when (applicationContext?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
             Configuration.UI_MODE_NIGHT_YES -> {
                 colorGreen = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_green))
                 colorRed = Color.valueOf(ContextCompat.getColor(applicationContext, R.color.dark_red))
@@ -320,5 +312,5 @@ class ReactionActivity: AppCompatActivity() {
 }
 
 enum class TestType {
-    NONE, React, GNG
+    React, GNG
 }

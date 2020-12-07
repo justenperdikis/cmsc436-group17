@@ -41,10 +41,11 @@
 
         <activity
             android:name=".GoNoGoActivity"
-            android:label="Go No-Go Test"
+            android:label="Go-No-Go Test"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".ReactionActivity"
+            android:label="Reaction Test"
             android:screenOrientation="portrait"/>
     </application>
 

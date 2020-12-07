@@ -2,7 +2,6 @@ package com.example.group17gonogo
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         loginLogoutButton = findViewById(R.id.main_login_or_logout_button)
         exitButton = findViewById(R.id.exit_button)
 
-        supportActionBar!!.setTitle("")
+        supportActionBar!!.title = ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                     .setPositiveButton(
                             "Ok"
                     ) { _, _ ->
-                        (this as MainActivity)
+                        this
                     }.create()
             mDialog.show()
         }
@@ -125,15 +124,15 @@ class MainActivity : AppCompatActivity() {
         dialog.setMessage("Choose the leaderboard you want to view.")
 
         dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Go No-Go Test") {
-            dialog, which ->
-            var intent = Intent(applicationContext, LeaderboardActivity::class.java)
+            dialog, _ ->
+            val intent = Intent(applicationContext, LeaderboardActivity::class.java)
             intent.putExtra("testType", TestType.GNG)
             startActivity(intent)
         }
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Reaction Test") {
             dialog, which ->
-            var intent = Intent(applicationContext, LeaderboardActivity::class.java)
+            val intent = Intent(applicationContext, LeaderboardActivity::class.java)
             intent.putExtra("testType", TestType.React)
             startActivity(intent)
         }
@@ -153,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, "Current user logged out.", Toast.LENGTH_LONG).show()
         } else {                                // login
             //Toast.makeText(applicationContext, "No user currently logged in.", Toast.LENGTH_LONG).show()
-            var intent = Intent(applicationContext, LoginActivity::class.java)
+            val intent = Intent(applicationContext, LoginActivity::class.java)
             startActivity(intent)
         }
     }

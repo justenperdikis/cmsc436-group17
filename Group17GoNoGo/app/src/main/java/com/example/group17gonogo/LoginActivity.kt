@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
 
@@ -22,9 +21,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginToRegister: TextView
     private lateinit var loginBtn: Button
     private lateinit var progressBar: ProgressBar
-
-    private val mRootRef = FirebaseDatabase.getInstance().reference
-    private val mUserRef = mRootRef.child("users")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,16 +34,16 @@ class LoginActivity : AppCompatActivity() {
         loginBtn = findViewById(R.id.login)
         progressBar = findViewById(R.id.progressBar)
 
-        loginBtn!!.setOnClickListener {
+        loginBtn.setOnClickListener {
             loginUserAccount()
         }
 
-        var text = "Don\'t have an account? Click here to register."
+        val text = "Don\'t have an account? Click here to register."
 
-        var ss = SpannableString(text)
-        var clickable = object: ClickableSpan() {
+        val ss = SpannableString(text)
+        val clickable = object: ClickableSpan() {
             override fun onClick(view: View) {
-                var intent = Intent(applicationContext, RegistrationActivity::class.java)
+                val intent = Intent(applicationContext, RegistrationActivity::class.java)
                 startActivity(intent)
             }
         }
@@ -57,14 +53,15 @@ class LoginActivity : AppCompatActivity() {
         loginToRegister.setText(ss)
         loginToRegister.movementMethod = LinkMovementMethod.getInstance()
 
-        supportActionBar!!.hide()                   // hide the action bar
+        // hide the action bar
+        supportActionBar!!.hide()
     }
 
     private fun loginUserAccount() {
         progressBar.visibility = View.VISIBLE
 
-        val email: String = userEmail?.text.toString()
-        var password: String = userPassword?.text.toString()
+        val email: String = userEmail.text.toString()
+        val password: String = userPassword.text.toString()
 
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(applicationContext, "Please enter an email!", Toast.LENGTH_LONG).show()
@@ -82,11 +79,9 @@ class LoginActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                    Toast.makeText(applicationContext, "Login successful!", Toast.LENGTH_LONG)
                        .show()
-                    //addUser(email)        //moved to RegistrationActivity
+                    val mainActivityIntent = Intent(this@LoginActivity, MainActivity::class.java)
+                    startActivity(mainActivityIntent)
                     finish()
-                    //var intent = Intent(this@LoginActivity, MainActivity::class.java)
-                    // intent.putExtra(USER_ID, mAuth!!.currentUser?.uid)
-                    //startActivity(intent)
                 } else {
                     Toast.makeText(
                         applicationContext,
@@ -95,19 +90,5 @@ class LoginActivity : AppCompatActivity() {
                     ).show()
                 }
             }
-        // use mAuth!!.currentUser != null to ensure that someone is signed in
-        // this is how we will check for a user being signed in
-        // in our GoNoGoActivity
-    }
-
-    // moved to RegistrationActivity
-    private fun addUser(email: String) {
-        if (mAuth?.currentUser != null) {
-            Toast.makeText(applicationContext, "User currently logged in", Toast.LENGTH_LONG).show()
-            val uid = mAuth!!.uid as String
-//                val id = mUserRef.child(uid).push().key
-            val user = User(uid, email)
-            mUserRef.child(uid).setValue(user)
-        }
     }
 }

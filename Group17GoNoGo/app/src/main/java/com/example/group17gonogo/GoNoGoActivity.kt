@@ -34,7 +34,7 @@ class GoNoGoActivity: AppCompatActivity() {
     private lateinit var startButton: Button
     private lateinit var reactionTestView: TextView
     private lateinit var instructionView: TextView
-    private lateinit var highScoreView: TextView
+    private lateinit var recentScoreView: TextView
 
     // color variables
     private lateinit var colorGreen: Color
@@ -75,11 +75,12 @@ class GoNoGoActivity: AppCompatActivity() {
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
         instructionView = findViewById(R.id.block_two)
-        highScoreView = findViewById(R.id.block_three)
+        recentScoreView = findViewById(R.id.block_three)
 
         mAuth = FirebaseAuth.getInstance()
         instructionView.setText(R.string.GoNoGo_instructions)
-        displayScore()                                              // display the player latest score in block3
+        // display the player latest score in block3
+        displayScore()
 
         //set to right depending on light or dark mode
         setColors()
@@ -92,19 +93,20 @@ class GoNoGoActivity: AppCompatActivity() {
 
             //counts down from 3
             var count = 3
-            var countdownTimer = object: CountDownTimer(3000, 1000) {
+            val countdownTimer = object: CountDownTimer(3000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
-                    reactionTestView.setText(count.toString())
-                    Log.i(TAG, "Count" + count.toString())
+                    reactionTestView.text = count.toString()
+                    Log.i(TAG, "Count$count")
                     count--
                 }
 
-                override fun onFinish() {                                                           // executed when timer is finished
+                // executed when timer is finished
+                override fun onFinish() {
                     //starts test
                     buttonPressed()
                 }
             }
-            countdownTimer!!.start()
+            countdownTimer.start()
 
             startButton.isEnabled = false
         }
@@ -115,6 +117,9 @@ class GoNoGoActivity: AppCompatActivity() {
         }
         // Disable clicking for reactionTestView until the start button is pressed
         reactionTestView.isClickable = false
+
+        // change the label in the actionbar
+        supportActionBar!!.title = "Go-No-Go Test"
     }
 
     private fun displayScore() {
@@ -123,12 +128,12 @@ class GoNoGoActivity: AppCompatActivity() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     Log.i(ReactionActivity.TAG, "onDataChanged in onStart called")
 
-                    var score: Any? = snapshot.child(mAuth!!.uid.toString()).child("score").getValue()
+                    val score: Any? = snapshot.child(mAuth!!.uid.toString()).child("score").value
 
                     if (score == null) {
-                        highScoreView.text = "Recent Score: 0"
+                        recentScoreView.text = getString(R.string.highscore_text, "0")
                     } else {
-                        highScoreView.text = "Recent Score: ${score.toString()}"
+                        recentScoreView.text = getString(R.string.highscore_text, score.toString())
                     }
                 }
 
@@ -137,20 +142,20 @@ class GoNoGoActivity: AppCompatActivity() {
                 }
             })
         } else {
-            var text = "Login here to see your recent score!"
+            val text = "Login here to see your recent score!"
 
-            var ss = SpannableString(text)
-            var clickable = object: ClickableSpan() {
+            val ss = SpannableString(text)
+            val clickable = object: ClickableSpan() {
                 override fun onClick(view: View) {
-                    var intent = Intent(applicationContext, LoginActivity::class.java)
+                    val intent = Intent(applicationContext, LoginActivity::class.java)
                     startActivity(intent)
                 }
             }
 
             ss.setSpan(clickable, 6, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-            highScoreView.setText(ss)
-            highScoreView.movementMethod = LinkMovementMethod.getInstance()
+            recentScoreView.setText(ss)
+            recentScoreView.movementMethod = LinkMovementMethod.getInstance()
         }
 
     }
@@ -166,7 +171,8 @@ class GoNoGoActivity: AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         displayScore()
-        loadSoundPool()                                             //load sound
+        //load sound
+        loadSoundPool()
         startButton.isEnabled = true
     }
 
@@ -188,25 +194,32 @@ class GoNoGoActivity: AppCompatActivity() {
         if (!hasStarted) {
             Log.i(TAG, "Start game")
             // start the game
-            goProbability = 0.8f                                    // reset the probability to original
-            reactionTestView.isClickable = true                     // make the TextView clickable
+            // reset the probability to original
+            goProbability = 0.8f
+            // make the TextView clickable
+            reactionTestView.isClickable = true
             hasStarted = true
             startTime = System.currentTimeMillis()
             startGame()
         } else {
             Log.i(TAG, "Ongoing game, change color")
             if (currNumOfTest < numOfTest) {
-                timer!!.cancel()                                   // end current timer
-                goProbability -= 0.01f                             // increase the probability of no-go appearing as the test goes
+                // end current timer
+                timer!!.cancel()
+                // increase the probability of no-go appearing as the test goes
+                goProbability -= 0.01f
 
                 // get the score value
-                var result = getScore()                 // get the score if the user pressed the screen before the timer ends
-                resultList.add(result)                            // record the current test result
-                //changeColor()                                   // change the color if RNGesus allows
+                // get the score if the user pressed the screen before the timer ends
+                val result = getScore()
+                // record the current test result
+                resultList.add(result)
                 testTransition()
 
-                currNumOfTest += 1                                // increase the number of test done
-                timer!!.start()                                   // start new timer for the next test
+                // increase the number of test done
+                currNumOfTest += 1
+                // start new timer for the next test
+                timer!!.start()
             } else {
                 reactionTestView.isClickable = false
                 gameComplete()
@@ -215,27 +228,34 @@ class GoNoGoActivity: AppCompatActivity() {
     }
 
     private fun startGame() {
-        changeColor()                                                                           // get the first color
+        // get the first color
+        changeColor()
 
-        timer = object: CountDownTimer(maxWaitTime.toLong(), maxWaitTime.toLong()) {          // create timer that run for 2 second
+        // create timer that run for 2 second
+        timer = object: CountDownTimer(maxWaitTime.toLong(), maxWaitTime.toLong()) {
             override fun onTick(millisUntilFinished: Long) {
                 // Do nothing
             }
 
-            override fun onFinish() {                                                           // executed when timer is finished
+            // executed when timer is finished
+            override fun onFinish() {
                 // get the score value
-                var result = getScore()
-                resultList.add(result)                                                          // record the current test result
-
-                currNumOfTest += 1                                                              // increase the number of test done
-                if (currNumOfTest < numOfTest) {                                                // check if game is complete or not
-                    goProbability -= 0.01f                                                      // increase the probability of no-go appearing as the test goes
-                    //changeColor()                                                               // change the color if RNGesus allows
+                val result = getScore()
+                // record the current test result
+                resultList.add(result)
+                // increase the number of test done
+                currNumOfTest += 1
+                // check if game is complete or not
+                if (currNumOfTest < numOfTest) {
+                    // increase the probability of no-go appearing as the test goes
+                    goProbability -= 0.01f
                     testTransition()
-                    timer!!.start()                                                               // start the timer again if the user did not click at all
+                    // start the timer again if the user did not click at all
+                    timer!!.start()
                 } else {
                     reactionTestView.isClickable = false
-                    gameComplete()                                                              // reached the max num of test, end the test
+                    // reached the max num of test, end the test
+                    gameComplete()
                 }
             }
         }
@@ -244,18 +264,19 @@ class GoNoGoActivity: AppCompatActivity() {
 
     // this function handle the short black screen between each test
     private fun testTransition() {
-        var transitionTimer: CountDownTimer = object: CountDownTimer(transitionLength, transitionLength) {
+        val transitionTimer: CountDownTimer = object: CountDownTimer(transitionLength, transitionLength) {
             override fun onTick(p0: Long) {
-                // change the bg to black
-                reactionTestView.isClickable = false                            // player shouldn't be able to interact with black screen
+                // change the background to black
+                // player shouldn't be able to interact with black screen
+                reactionTestView.isClickable = false
                 startTime = System.currentTimeMillis()
                 reactionTestView.setBackgroundColor(colorBlack.toArgb())
                 reactionTestView.text = ""
             }
 
             override fun onFinish() {
-                // call changeColor
-                changeColor()                                                   // black screen is over, change the color to the next one
+                // black screen is over, change the color to the next one
+                changeColor()
                 reactionTestView.isClickable = true
             }
 
@@ -266,7 +287,6 @@ class GoNoGoActivity: AppCompatActivity() {
     // this function checks if the user success or failed the test
     private fun getScore() : GNGResult {
         var time = getElapsedTime(startTime, System.currentTimeMillis())
-        //Log.i(TAG, "starttime: ${startTime}, time: $time , current time: ${System.currentTimeMillis()}")
 
         if (mode == GNGMode.GO) {
             if (time < maxWaitTime) {
@@ -284,14 +304,13 @@ class GoNoGoActivity: AppCompatActivity() {
             }
         }
 
-        var result = GNGResult(time, this.mode, testStatus)
-
-        return result
+        return GNGResult(time, mode, testStatus)
     }
 
     private fun gameComplete() {
         Log.i(TAG, "Game complete")
-        currNumOfTest = 0                                                                   // reset the num of test counter
+        // reset the num of test counter
+        currNumOfTest = 0
         // show player test result
         reactionTestView.setBackgroundColor(colorGray.toArgb())
         startButton.text = "Retry?"
@@ -304,19 +323,22 @@ class GoNoGoActivity: AppCompatActivity() {
     private fun changeColor() {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
 
-        var rand = (0..100).random()                                    // generate random number between 0 and 100
-        var ngBound = 100 * noGoProbability
+        // generate random number between 0 and 100
+        val rand = (0..100).random()
+        val ngBound = 100 * noGoProbability
 
         if (rand < ngBound) {
+            // record the test is currently showing a No-Go
             mode =
-                GNGMode.NO_GO                                        // record the test is currently showing a No-Go
+                GNGMode.NO_GO
             reactionTestView.setBackgroundColor(colorRed.toArgb())
-            reactionTestView.setText("No Go")
+            reactionTestView.text = "No Go"
         } else {
+            // record the test is currently showing a Go
             mode =
-                GNGMode.GO                                           // record the test is currently showing a Go
+                GNGMode.GO
             reactionTestView.setBackgroundColor(colorGreen.toArgb())
-            reactionTestView.setText("Go")
+            reactionTestView.text = "Go"
         }
     }
 

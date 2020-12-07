@@ -6,7 +6,6 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -25,10 +24,8 @@ class RegistrationActivity : AppCompatActivity(){
 
     private var mAuth: FirebaseAuth? = null
 
-    //-----------test------------
     private val mRootRef = FirebaseDatabase.getInstance().reference
     private val mUserRef = mRootRef.child("users")
-    // ------------------------
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,23 +40,23 @@ class RegistrationActivity : AppCompatActivity(){
         registerToLogin = findViewById(R.id.register_to_login)
         progressBar = findViewById(R.id.progressBar)
 
-        regBtn!!.setOnClickListener {
+        regBtn.setOnClickListener {
             registerNewUser()
         }
 
-        var text = "Already have an account? Click here to login."
+        val text = "Already have an account? Click here to login."
 
-        var ss = SpannableString(text)
-        var clickable = object: ClickableSpan() {
+        val ss = SpannableString(text)
+        val clickable = object: ClickableSpan() {
             override fun onClick(view: View) {
-                var intent = Intent(applicationContext, LoginActivity::class.java)
+                val intent = Intent(applicationContext, LoginActivity::class.java)
                 startActivity(intent)
             }
         }
 
         ss.setSpan(clickable, 31, 35, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        registerToLogin.setText(ss)
+        registerToLogin.text = ss
         registerToLogin.movementMethod = LinkMovementMethod.getInstance()
 
         supportActionBar!!.hide()                   // hide the action bar
@@ -68,11 +65,11 @@ class RegistrationActivity : AppCompatActivity(){
 
     private fun registerNewUser() {
         // register for new user
-        progressBar!!.visibility = View.VISIBLE
+        progressBar.visibility = View.VISIBLE
 
-        val email: String = email!!.text.toString()
-        val password: String = password!!.text.toString()
-        val username: String = username!!.text.toString()
+        val email: String = email.text.toString()
+        val password: String = password.text.toString()
+        val username: String = username.text.toString()
 
         if (!validator.validUsername(username)) {
             Toast.makeText(applicationContext, "Please enter a valid username!", Toast.LENGTH_LONG).show()
@@ -91,14 +88,12 @@ class RegistrationActivity : AppCompatActivity(){
 
         mAuth!!.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    progressBar!!.visibility = View.GONE
+                    progressBar.visibility = View.GONE
                     if (task.isSuccessful) {
                         Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_LONG).show()
                         // move to login page
                         val intent = Intent(this@RegistrationActivity, LoginActivity::class.java)
-                        //----------------------test ---------
                         addUser(email, username)
-                        //-------------------------------------
                         startActivity(intent)
                         finish()
                     } else {
@@ -110,9 +105,7 @@ class RegistrationActivity : AppCompatActivity(){
     // --------------------------------- test -------------------------------
     private fun addUser(email: String, username: String) {
         if (mAuth?.currentUser != null) {
-            Toast.makeText(applicationContext, "User currently logged in", Toast.LENGTH_LONG).show()
             val uid = mAuth!!.uid as String
-//                val id = mUserRef.child(uid).push().key
             val user = User(username, email)
             mUserRef.child(uid).setValue(user)
         }

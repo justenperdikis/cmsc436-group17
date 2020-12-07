@@ -48,7 +48,7 @@ class TestResultPopUp : Activity() {
 
         window.setLayout(1000, 1500)                                        // set the size of the popup window, might need to adjust later based on the number of test done
 
-        var windowParams = window.attributes
+        val windowParams = window.attributes
         windowParams.gravity = Gravity.CENTER                                            // set the pop up window to appear in the center of the screen
 
         window.attributes = windowParams
@@ -57,7 +57,7 @@ class TestResultPopUp : Activity() {
 
 
         showLeaderboardButton.setOnClickListener() {
-            var intent = Intent(applicationContext, LeaderboardActivity::class.java)
+            val intent = Intent(applicationContext, LeaderboardActivity::class.java)
             intent.putExtra("testType", testType)
             startActivity(intent)
         }
@@ -72,7 +72,7 @@ class TestResultPopUp : Activity() {
         // loop through the list, create resultString based on the value on each result, append it to create one long string
         if (testType == TestType.GNG) {
             for (result in list) {
-                var singleResult = "${result.getGNGMode()} - ${result.getReactTime()} ms - ${result.getTestStatus()}\n"
+                val singleResult = "${result.getGNGMode()} - ${result.getReactTime()} ms - ${result.getTestStatus()}\n"
                 resultText += singleResult
 
                 // the smaller the score, the better the user perform on the test
@@ -86,7 +86,7 @@ class TestResultPopUp : Activity() {
             }
         } else if (testType == TestType.React) {                                    // calculate the score for reaction test
             for (result in list) {
-                var singleResult = "${result.getReactTime()} ms - ${result.getTestStatus()}\n"
+                val singleResult = "${result.getReactTime()} ms - ${result.getTestStatus()}\n"
                 resultText += singleResult
 
                 if (result.getTestStatus() == TestStatus.SUCCESS) {
@@ -123,12 +123,12 @@ class TestResultPopUp : Activity() {
     }
 
     private fun setNotice() {
-        var text = "Login here to see the leaderboard!"
+        val text = "Login here to see the leaderboard!"
 
-        var ss = SpannableString(text)
-        var clickable = object: ClickableSpan() {
+        val ss = SpannableString(text)
+        val clickable = object: ClickableSpan() {
             override fun onClick(view: View) {
-                var intent = Intent(applicationContext, LoginActivity::class.java)
+                val intent = Intent(applicationContext, LoginActivity::class.java)
                 startActivity(intent)
             }
         }
@@ -148,17 +148,18 @@ class TestResultPopUp : Activity() {
 
         currUser.addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                var username = snapshot.getValue().toString()
+                val username = snapshot.value.toString()
 
                 // record the data inside onDataChange because it took time to access database and query the username
                 val score = Score(username, score.toInt())
 
-                if (testType == TestType.GNG) {
-                    mGNGScoreRef.child(uid).setValue(score)
-                } else if (testType == TestType.React) {
-                    mReactionScoreRef.child(uid).setValue(score)
-                } else {
-                    // not suppose to enter here
+                when (testType) {
+                    TestType.GNG -> {
+                        mGNGScoreRef.child(uid).setValue(score)
+                    }
+                    TestType.React -> {
+                        mReactionScoreRef.child(uid).setValue(score)
+                    }
                 }
             }
 
