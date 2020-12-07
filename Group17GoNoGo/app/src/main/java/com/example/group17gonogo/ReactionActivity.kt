@@ -19,6 +19,7 @@ class ReactionActivity: AppCompatActivity() {
 
     private lateinit var startButton: Button
     private lateinit var reactionTestView: TextView
+    private lateinit var instructionView: TextView
 
     private lateinit var colorGreen: Color
     private lateinit var colorRed: Color
@@ -45,6 +46,9 @@ class ReactionActivity: AppCompatActivity() {
         // If on block three, make it invisible after it is pressed
         startButton = findViewById(R.id.goNoGoStart_button)
         reactionTestView = findViewById(R.id.block_four)
+        instructionView = findViewById(R.id.block_two)
+
+        instructionView.setText(R.string.ReactionTest_instructions)
 
         //Set colors depending on light or dark mode
         setColors()
@@ -167,6 +171,7 @@ class ReactionActivity: AppCompatActivity() {
                 Log.i(TAG, "Testing Done!")
                 subtestTimer.cancel()
                 view.setBackgroundColor(colorGray.toArgb())
+                view.text = ""
                 Log.i(TAG, "$resultList")
                 // TODO -- If we expand our firebase realtime database to hold reaction test scores,
                 //  will need to send an intent to the TestResultPopUp activity with the resultList

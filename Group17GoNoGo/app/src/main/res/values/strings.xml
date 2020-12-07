@@ -17,4 +17,16 @@
     <string name="register">Register</string>
     <string name="account_login">Account Login</string>
     <string name="test_result_text">Test Result</string>
+    <string name="GoNoGo_instructions">
+        Welcome to the Go-No-Go test!  Once the game begins, you will
+        be prompted with either a "Go" or "No Go" event.  You should tap as fast as possible for
+        "Go," and make sure not to tap the screen when "No Go" appears.  When the trial is finished,
+        you\'ll be able to see a breakdown of your score and, if you are logged in, how you compare
+        to other users!  When ready to play, click the button in the middle of the play area!
+    </string>
+    <string name="ReactionTest_instructions">
+        This is a simple reaction test.  When the lower section of the screen flashes GREEN, tap as
+        quickly as you can!  If you don\'t react in time, the screen will flash RED.
+        When ready to play, click the button in the middle of the play area!
+    </string>
 </resources>

@@ -10,38 +10,28 @@
     <TextView
         android:id="@+id/block_one"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="60dp"
         android:layout_margin="2dp"
         android:background="@color/white"
         android:padding="16dp"
         android:gravity="center"
-        android:text="Block One"
+        android:text="Instructions"
+        android:textSize="20dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/block_two"/>
 
     <TextView
         android:id="@+id/block_two"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="150dp"
         android:layout_margin="2dp"
         android:background="@color/white"
         android:padding="16dp"
         android:gravity="center"
         android:text="Block Two"
+        android:textSize="15dp"
         app:layout_constraintTop_toBottomOf="@id/block_one"
-        app:layout_constraintBottom_toTopOf="@id/block_three"/>
-
-    <TextView
-        android:id="@+id/block_three"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="2dp"
-        android:background="@color/white"
-        android:padding="16dp"
-        android:gravity="center"
-        android:text="Block Three"
-        app:layout_constraintTop_toBottomOf="@id/block_two"
-        app:layout_constraintBottom_toTopOf="@id/block_four" />
+        app:layout_constraintBottom_toTopOf="@id/block_four"/>
 
     <Button
         android:id="@+id/goNoGoStart_button"
@@ -52,22 +42,22 @@
         android:padding="16dp"
         android:text="Start The Test"
         app:layout_constraintBottom_toBottomOf="@id/block_four"
-        app:layout_constraintEnd_toEndOf="@id/block_three"
+        app:layout_constraintEnd_toEndOf="@id/block_two"
         app:layout_constraintStart_toStartOf="@id/block_four"
-        app:layout_constraintTop_toBottomOf="@id/block_three" />
+        app:layout_constraintTop_toBottomOf="@id/block_two" />
 
 
     <TextView
         android:id="@+id/block_four"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="425dp"
         android:layout_margin="2dp"
         android:background="@color/gray"
         android:padding="16dp"
         android:gravity="center"
-        android:text="Block Four"
+        android:text=""
         android:textSize="50dp"
-        app:layout_constraintTop_toBottomOf="@id/block_three"
+        app:layout_constraintTop_toBottomOf="@id/block_two"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
