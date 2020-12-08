@@ -54,21 +54,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        //Changes themes to red or green
-        if (item.itemId == R.id.change_theme) {
-            mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
-
-            Log.i(TAG, theme.resources.toString())
-            isRedTheme = if (!isRedTheme){
-                setTheme(R.style.Theme_Red)
-                true
-            } else {
-                setTheme(R.style.Theme_Group17GoNoGo)
-                false
-            }
-            setContentView(R.layout.activity_main)
-        }
-
         //Display alert dialog of extra information
         if (item.itemId == R.id.more_info){
             mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
