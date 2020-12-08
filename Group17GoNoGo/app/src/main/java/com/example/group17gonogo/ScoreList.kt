@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 
+// This class manage the adapter for the score leaderboard
+// and is based on the AuthorList.kt class in the Lab7-Firebase project
 class ScoreList(private val context:Activity, private var scores: List<Score>) :
     ArrayAdapter<Score>(context, R.layout.score_list_layout, scores) {
 
