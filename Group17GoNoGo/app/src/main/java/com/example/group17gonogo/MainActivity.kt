@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var instructionButton: Button
     private lateinit var leaderboardButton: Button
     private lateinit var loginLogoutButton: Button
-    private lateinit var exitButton: Button
 
     private lateinit var mAudioManager: AudioManager
     private lateinit var mDialog: AlertDialog
@@ -44,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         instructionButton = findViewById(R.id.reactionTest_button)
         leaderboardButton = findViewById(R.id.main_leaderboard_button)
         loginLogoutButton = findViewById(R.id.main_login_or_logout_button)
-        exitButton = findViewById(R.id.exit_button)
 
         supportActionBar!!.title = ""
     }
@@ -158,11 +156,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //Exits the app
-    fun exitApp(view: View) {
-        super.onBackPressed()
-//        Log.i(TAG, "Exiting app")
-    }
 
     @SuppressLint("SetTextI18n")
     override fun onResume() {
