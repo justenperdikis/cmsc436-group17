@@ -1,5 +1,6 @@
 package com.example.group17gonogo
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -307,6 +308,7 @@ class GoNoGoActivity: AppCompatActivity() {
         return GNGResult(time, mode, testStatus)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun gameComplete() {
         Log.i(TAG, "Game complete")
         // reset the num of test counter
@@ -320,6 +322,7 @@ class GoNoGoActivity: AppCompatActivity() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun changeColor() {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
 

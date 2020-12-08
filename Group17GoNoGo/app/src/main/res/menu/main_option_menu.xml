@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="20dp"
     android:layout_width="match_parent">
 
     <item android:id="@+id/change_theme"
-        android:title="Change Theme"/>
+        android:title="Change Theme"
+        tools:ignore="HardcodedText" />
 
     <item android:id="@+id/more_info"
-        android:title="More Information"/>
+        android:title="More Information"
+        tools:ignore="HardcodedText" />
 
 
 </menu>

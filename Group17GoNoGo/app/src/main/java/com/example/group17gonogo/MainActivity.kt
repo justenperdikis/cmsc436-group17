@@ -1,5 +1,6 @@
 package com.example.group17gonogo
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -143,6 +144,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Logs out the current user and displays toast
+    @SuppressLint("SetTextI18n")
     fun loginLogout(view: View) {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_SPACEBAR)
         if (mAuth.currentUser != null) {        // logout
@@ -162,6 +164,7 @@ class MainActivity : AppCompatActivity() {
 //        Log.i(TAG, "Exiting app")
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
         if (mAuth.currentUser == null) {

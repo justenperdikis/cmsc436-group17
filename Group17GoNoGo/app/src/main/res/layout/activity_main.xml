@@ -17,7 +17,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintVertical_bias="0.5"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/reactionTest_button"
@@ -29,7 +30,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.57" />
+        app:layout_constraintVertical_bias="0.57"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/main_leaderboard_button"
@@ -42,7 +44,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.64" />
+        app:layout_constraintVertical_bias="0.64"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/main_login_or_logout_button"
@@ -55,7 +58,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.71"/>
+        app:layout_constraintVertical_bias="0.71"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/exit_button"
@@ -68,7 +72,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.78" />
+        app:layout_constraintVertical_bias="0.78"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/logoView"

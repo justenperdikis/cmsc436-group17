@@ -26,7 +26,7 @@
         android:paddingBottom="20dp"
         android:textAlignment="center"
         android:scrollbars="vertical"
-        tools:ignore="SpUsage" />
+        tools:ignore="HardcodedText,SpUsage" />
 
     <TextView
         android:id="@+id/notice_text"
@@ -43,6 +43,7 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:visibility="invisible"
-        android:text="Leaderboard"/>
+        android:text="Leaderboard"
+        tools:ignore="HardcodedText" />
 
 </LinearLayout>

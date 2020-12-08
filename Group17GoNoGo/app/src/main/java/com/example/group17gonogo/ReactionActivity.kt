@@ -126,6 +126,7 @@ class ReactionActivity: AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun startReactionTest(view: TextView) {
         mAudioManager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
         testDone = false
@@ -189,6 +190,7 @@ class ReactionActivity: AppCompatActivity() {
                 }
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onFinish() {
                 if (!testDone) {
                     Log.i(TAG, "Not fast enough!")
@@ -213,6 +215,7 @@ class ReactionActivity: AppCompatActivity() {
         // When currInterval is equal to timeUntilNextSubtest, the required amount of time
         // has passed and the next subtest can begin
         val testTimer = object: CountDownTimer(testDuration.toLong(), 1000) {
+            @SuppressLint("SetTextI18n")
             override fun onTick(millisUntilFinished: Long) {
                 if (timeUntilNextSubtest.toLong() == (currInterval++).toLong()) {
                     Log.i(TAG, "Changing to \"go\" color")
@@ -233,6 +236,7 @@ class ReactionActivity: AppCompatActivity() {
                 }
 
             }
+            @SuppressLint("SetTextI18n")
             override fun onFinish() {
                 Log.i(TAG, "Testing Done!")
                 testDone = true
