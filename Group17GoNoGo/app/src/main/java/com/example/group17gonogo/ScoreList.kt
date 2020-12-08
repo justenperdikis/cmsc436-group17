@@ -13,8 +13,6 @@ import android.widget.TextView
 class ScoreList(private val context:Activity, private var scores: List<Score>) :
     ArrayAdapter<Score>(context, R.layout.score_list_layout, scores) {
 
-    // ToDo: add comment here
-
     private lateinit var username: TextView
     private lateinit var scoreValue: TextView
 
